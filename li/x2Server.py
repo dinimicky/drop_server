@@ -38,24 +38,10 @@ class X2ServerProtocol(MultiXmlStream):
             log.msg('recv X2 Notify Message:', str(Elements))
             self.factory.messages.append(Elements)
         MultiXmlStream.onDocumentEnd(self)
-
-from twisted.internet import defer            
+            
 class X2ServerFactory(ServerFactory):
     protocol = X2ServerProtocol
-    def __init__(self, cmd2_queue = defer.DeferredQueue(), x2_queue = defer.DeferredQueue(), state = None):
-        self.messages = []
-        self.cmd2_queue = cmd2_queue
-        self.x2_queue = x2_queue
-        self.state = state
-        self.x2_queue.get().addCallback(self.cmd2Received)
         
     
-    def cmd2Received(self, reqMsg):
-        if reqMsg.type == 'cmd' and reqMsg.expectedRes == 'x2Msgs':
-            log.msg("expect: %s, expect msg number: %d" % (reqMsg.expectedRes, reqMsg.content))
-            Msgs, self.messages = self.messages, []
-            Resp = RespMsg(result = Msgs, content = reqMsg.content)
-            self.cmd2_queue.put(Resp)
-        self.x2_queue.get().addCallback(self.cmd2Received)
         
         

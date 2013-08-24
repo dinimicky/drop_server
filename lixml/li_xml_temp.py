@@ -17,29 +17,32 @@ def start():
     <proposedProtocolVersions>
     <ProtocolVersion><major>%d</major><minor>%d</minor></ProtocolVersion>
     </proposedProtocolVersions>
+    %s
     </LIC-ProtocolProposal>
     <LIC-ProtocolProposal>
     <protocol>%s</protocol>
     <proposedProtocolVersions>
     <ProtocolVersion><major>%d</major><minor>%d</minor></ProtocolVersion>
     </proposedProtocolVersions>
-    <ack-request-supported/>
+    %s
     </LIC-ProtocolProposal>
     <LIC-ProtocolProposal>
     <protocol>%s</protocol>
     <proposedProtocolVersions>
     <ProtocolVersion><major>%d</major><minor>%d</minor></ProtocolVersion>
     </proposedProtocolVersions>
+    %s
     </LIC-ProtocolProposal>
     </protocolProposal>
     </protocolNegotiation>
     </payload>
     </LIC-Msg>
-    '''    
+    '''
+    ack = '<ack-request-supported/>'   
     return Start % (config.Lic_ObjectId, config.Lic_ProtObjectId, 
-                    config.LI_ADM_ObjectId, config.LI_ADM_Versions.major, config.LI_ADM_Versions.minor,
-                    config.LI_IRI_ObjectId, config.LI_IRI_Versions.major, config.LI_IRI_Versions.minor,
-                    config.LI_CC_ObjectId, config.LI_CC_Versions.major, config.LI_CC_Versions.minor)
+                    config.LI_ADM_ObjectId, config.LI_ADM_Versions.major, config.LI_ADM_Versions.minor, ack if config.LI_ADM_AckSupported else "",
+                    config.LI_IRI_ObjectId, config.LI_IRI_Versions.major, config.LI_IRI_Versions.minor, ack if config.LI_IRI_AckSupported else "",
+                    config.LI_CC_ObjectId, config.LI_CC_Versions.major, config.LI_CC_Versions.minor, ack if config.LI_CC_AckSupported else "")
 
 def stop():
     Stop = '''

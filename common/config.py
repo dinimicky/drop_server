@@ -29,6 +29,7 @@ x2InterfacePort = 22345
 x3InterfacePort = 32345
 cmdServerPort = 33333
 
+x2InterfaceLog = "./x2.log"
 pingEnable = False
 ping_timeout = 60
 ping_delay = 30
@@ -40,7 +41,7 @@ ping_delay = 30
 # Example:    0.4.0.127.0.5.3.4.1
 Lic_ObjectId = "0.4.0.127.0.5.3.4.1"
 Lic_ProtObjectId = "0.4.0.127.0.5.3.1.1"
-Lic_ProtVersion = Version()
+Lic_ProtVersion = Version(1,0)
 Lic_AckRequired = False
 
 #-------------------------------------------------
@@ -48,7 +49,7 @@ Lic_AckRequired = False
 # Values:    long values separated by | (pipe)
 # Example:    1.0
 LI_ADM_ObjectId = "0.4.0.127.0.5.3.1.1"
-LI_ADM_Versions = Version()
+LI_ADM_Versions = Version(1,0)
 LI_ADM_AckSupported = False
 
 #-------------------------------------------------
@@ -56,7 +57,7 @@ LI_ADM_AckSupported = False
 # Values:    long values separated by | (pipe)
 # Example:    1.0
 LI_IRI_ObjectId = "0.4.0.127.0.5.3.2.1"
-LI_IRI_Versions = Version()
+LI_IRI_Versions = Version(1,0)
 LI_IRI_AckSupported = True
 
 #-------------------------------------------------
@@ -64,7 +65,7 @@ LI_IRI_AckSupported = True
 # Values:    long values separated by | (pipe)
 # Example:    1.0
 LI_CC_ObjectId = "0.4.0.127.0.5.3.3.1"
-LI_CC_Versions  = Version()
+LI_CC_Versions  = Version(1,0)
 LI_CC_AckSupported = False
 
 

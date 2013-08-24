@@ -32,7 +32,6 @@ What kind of command is specified?
      <action>start</action>
  </cmd>
 
-
  Stop:
  <cmd>
      <action>stop</action>
@@ -96,16 +95,7 @@ addTarget:
      <result>success/failure</result>
  </cmd>   
 '''
-class CmdProxyServerProtocol(xmlstream.XmlStream):
-    ActionDict = {'start':[],
-                  'stop':[],
-                  'intCfg': [],
-                  'intChg' : ['x2IP', 'x2Port', 'x3IP', 'x3Port'],
-                  'audReq': ['uri'],
-                  'addTgt':['uri', 'lirid', 'ccReq' ],
-                  'updTgt':['uri', 'lirid', 'ccReq' ],
-                  'remTgt':['uri'],
-                  'x2Msgs': ['num']}   
+class CmdProxyServerProtocol(xmlstream.XmlStream):   
     def connectionMade(self):
         log.msg("generate a connection, self is " + str(self))
         self.cmd_queue = self.factory.cmd_queue
@@ -114,13 +104,6 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         self.x1CliFac = self.factory.x1CliFac
         self.x1tcp = self.factory.x1tcp
         self.cmd_queue.get().addCallback(self.x1RespReceived)
-        
-        self.cmd2_queue = self.factory.cmd2_queue
-        self.x2_queue = self.factory.x2_queue
-        self.x2CliFac = self.factory.x2CliFac
-        self.x2tcp = self.factory.x2tcp
-        self.cmd2_queue.get().addCallback(self.x2RespReceived)
-        xmlstream.XmlStream.connectionMade(self)
 
     def onDocumentStart(self, rootElement):
         if 'cmd' == rootElement.name:
@@ -404,7 +387,7 @@ class CmdProxyFactory(ServerFactory):
         
         self.cmd2_queue = DeferredQueue()
         self.x2_queue = DeferredQueue()
-        self.x2CliFac = X2ServerFactory(self.cmd2_queue, self.x2_queue, self.state)
+        self.x2CliFac = X2ServerFactory(self.cmd2_queue, self.state)
         self.x2tcp = None
         from twisted.internet import reactor
         self.x2tcp = reactor.listenTCP(config.x2InterfacePort, self.x2CliFac, 
