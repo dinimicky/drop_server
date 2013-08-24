@@ -1,0 +1,193 @@
+'''
+Created on 2013-3-1
+
+@author: ezonghu
+'''
+resp = [
+'''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <payload>
+      <protocolNegotiation>
+         <protocolSelectionResult>
+            <protocolSelectionList>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.1.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.2.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.3.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+            </protocolSelectionList>
+         </protocolSelectionResult>
+      </protocolNegotiation>
+   </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <interfConfResponse>
+      <sendingNodeInfo>
+        <sendingNodeType><mrf/></sendingNodeType>
+          <sendingNodeVersion>
+            <majorVersion>3</majorVersion>
+            <minorVersion>0</minorVersion>
+          </sendingNodeVersion>
+        </sendingNodeInfo>
+      <result><success/></result>
+      <maxNumberOf-LI-IRI-Messages>4</maxNumberOf-LI-IRI-Messages>
+      <warrant-info-valid/>
+    </interfConfResponse>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <addTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </addTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <auditResponse>
+      <seqNbr>23</seqNbr>
+      <targetInfo>
+        <targetId><uri>sip:junhua@ericsson.com</uri></targetId>
+        <cCRequired/>
+        <lIRID>1111</lIRID>
+      </targetInfo>
+      <result><success/></result>
+      <totNbrTargetsInAuditResp>1</totNbrTargetsInAuditResp>
+    </auditResponse>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <auditResponse>
+      <seqNbr>23</seqNbr>
+      <targetInfo>
+        <targetId><uri>sip:junhua@ericsson.com</uri></targetId>
+        <cCRequired/>
+        <lIRID>1111</lIRID>
+      </targetInfo>
+      <result><success/></result>
+      <totNbrTargetsInAuditResp>6</totNbrTargetsInAuditResp>
+      <remainTargetsInAuditResp/>
+    </auditResponse>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <updateTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </updateTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <removeTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </removeTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+'''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <endSessionAck/>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+''',
+]
