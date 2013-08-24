@@ -9,6 +9,21 @@ from common.state import State, TcpConn, ReqMsg, RespMsg, X1ProtocolNegotiation,
 from lixml import li_xml_temp
 from twisted.python import log
 '''
+drop_server
+===========
+dropServer has 3 port 
+Port 1 is to accept the command xml stream by TCP
+Port 2 is to send some xml stream to SUT according to the command by TCP
+Port 3 is to receive some xml stream from SUT by TCP, the xml streams will be write to some file.
+
+dropClient
+==========
+dropClient 
+1. send the command xml stream to dropServer accroding to the input parameters
+2. receive the result (success/failure) of the command from dropServer
+
+
+What kind of command is specified?
  ========================================
  Request:
  ========================================
@@ -16,21 +31,21 @@ from twisted.python import log
  <cmd>
      <action>start</action>
  </cmd>
- {'cmd' : [{'action':'start'}]}
+
 
  Stop:
  <cmd>
      <action>stop</action>
  </cmd>
- {'cmd' : [{'action':'stop'}]}
 
-intCfg:
+intChgX2:
 <cmd>
-    <action>intCfg</action> 
+    <action>intChg</action>
+    <x2IP>127.0.0.1</x2IP>
+    <x2Port>11111<x2Port> 
 </cmd>
-{'cmd' : [{'action':'intCfg'}]}
 
-intChg:
+intChgX2X3:
 <cmd>
     <action>intChg</action>
     <x2IP>127.0.0.1</x2IP>
@@ -38,22 +53,27 @@ intChg:
     <x3IP>127.0.0.1</x3IP>
     <x3Port>22222<x3Port>    
 </cmd>
-[('cmd', [('action', 'intChg'),('x2IP', '127.0.0.1'),('x2Port', 11111),('x3IP', '127.0.0.1'),('x3Port', 22222)])]
+
+
 audReq:
 <cmd>
     <action>audReq</action> 
     <uri>sip:123@163.com</uri>
 </cmd>
-{'cmd' : [{'action':'audReq'}, {'uri' : 'sip:123@163.com'}]}
 
- addTarget:
- <cmd>
-     <action>addTgt</action>
-     <uri>sip:123@163.com</uri>
-     <ccReq>true</ccReq>
-     <lirid>1234</lirid>
- </cmd>
- {'cmd': [{'action':'addTgt'}, {}]}
+audAll:
+<cmd>
+    <action>audAll</action> 
+    <uri>sip:123@163.com</uri>
+</cmd>
+addTarget:
+<cmd>
+    <action>addTgt</action>
+    <uri>sip:123@163.com</uri>
+    <ccReq>True</ccReq>
+    <lirid>1234</lirid>
+</cmd>
+
 
  removeTarget:
  <cmd>
@@ -69,17 +89,11 @@ audReq:
      <lirid>1234</lirid>
  </cmd>
  
- x2Msgs:
-  <cmd>
-     <action>x2Msgs</action>
-     <num>1</num>
- </cmd>
  ========================================
  Response:
  ========================================
  <cmd>
      <result>success/failure</result>
-     <comment>.....</comment>
  </cmd>   
 '''
 class CmdProxyServerProtocol(xmlstream.XmlStream):
