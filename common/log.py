@@ -3,7 +3,7 @@ Created on 2013-8-24
 
 @author: Brilliant
 '''
-class log(object):
+class X2Log(object):
     def __init__(self, logHandler):
         self.logHandler = logHandler
         self.Counter = 1
@@ -22,7 +22,7 @@ class log(object):
 
 
 fd = open("test.log", "w")
-test = log(fd)
+test = X2Log(fd)
 test.msg("test1\ntest2\n")
 test.msg("test3\ntest4\n")  
 fd.close()  
