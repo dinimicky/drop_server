@@ -3,6 +3,8 @@ Created on 2013-8-24
 
 @author: Brilliant
 '''
+
+from twisted.python.logfile import LogFile
 class X2Log(object):
     def __init__(self, logHandler):
         self.logHandler = logHandler
@@ -17,6 +19,7 @@ class X2Log(object):
                 self.logHandler.write("%d:%s\n" % (self.Counter, line))
         self.logHandler.write("%d:%s\n" % (self.Counter, tail))
         self.Counter += 1
+        self.logHandler.flush()
         
         
 

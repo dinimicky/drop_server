@@ -23,6 +23,7 @@ class X2ServerProtocol(MultiXmlStream):
         Elements = self.Elements
         if 'pingRequest' in str(Elements):
             log.msg('recv pingRequest')
+            self.factory.x2LogHandler.msg(str(Elements))
             (_, Payloads) = self.check_tuple('payload', Elements)
             Payload = Payloads[0]
             log.msg('get the payload:', Payload)
