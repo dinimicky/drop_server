@@ -149,23 +149,15 @@ class Test(unittest.TestCase):
         def get_resp(Keys):
             log.msg("recv key: %s" % str(Keys))
             self.assertIn('pingResponse', str(Keys))
-
+ 
         return d.addCallback(get_resp)
  
-#    def testX2Msgs(self):
-#        d = LiClient(config.ipAddress_LITT, config.x2InterfacePort, [x2Msg]*2)
-#        def eNumber(Msgs):
-#            log.msg('recv Msgs', Msgs)
-#            
-#        self.x2Server.cmd2_queue.get().addCallback(eNumber)
-#
-#
-#        def get_resp(Keys):
-#            from common import state
-#            self.x2Server.x2_queue.put(state.ReqMsg("x2Msgs", 7))
-#            log.msg("recv key: %s" % str(Keys))
-#            self.assertIn('OK', str(Keys))
-#    
-#        return d.addCallback(get_resp)   
+    def testX2Msgs(self):
+        d = LiClient(config.ipAddress_LITT, config.x2InterfacePort, [x2Msg]*2)
+        def get_resp(Keys):
+            log.msg("recv key: %s" % str(Keys))
+            self.assertIn('lic-ModuleID', str(Keys))
+    
+        return d.addCallback(get_resp)   
 
 

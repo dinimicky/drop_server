@@ -286,15 +286,16 @@ def pingX2Resp(
     return Ping % (config.Lic_ObjectId, config.LI_IRI_ObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor,  
                    SeqNbr)
 
-print start()
-print intCfgX2()
-print intCfgX2X3()
-print audAllTgt()
-print audTgtUri()
-print addTgtUri()
-print updTgtUri()
-print remTgtUri()
-print stop()
-
-print pingX1Req()
-print pingX2Resp()
+if __name__ == "__main__":
+    print start()
+    print intCfgX2()
+    print intCfgX2X3()
+    print audAllTgt()
+    print audTgtUri()
+    print addTgtUri()
+    print updTgtUri()
+    print remTgtUri()
+    print stop()
+    
+    print pingX1Req()
+    print pingX2Resp()

@@ -20,9 +20,9 @@ class X2Log(object):
         
         
 
-
-fd = open("test.log", "w")
-test = X2Log(fd)
-test.msg("test1\ntest2\n")
-test.msg("test3\ntest4\n")  
-fd.close()  
+if __name__ == "__main__":
+    fd = open("test.log", "w")
+    test = X2Log(fd)
+    test.msg("test1\ntest2\n")
+    test.msg("test3\ntest4\n")  
+    fd.close()  
