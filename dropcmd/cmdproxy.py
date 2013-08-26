@@ -63,7 +63,6 @@ audReq:
 audAll:
 <cmd>
     <action>audAll</action> 
-    <uri>sip:123@163.com</uri>
 </cmd>
 addTarget:
 <cmd>
@@ -96,6 +95,15 @@ addTarget:
  </cmd>   
 '''
 class CmdProxyServerProtocol(xmlstream.XmlStream):   
+    ActionDict = {'start' : [],
+                  'stop' : [],
+                  'intCfgX2' : [],
+                  'intCfgX2X3' : [],
+                  'audReq' : ['uri'],
+                  'audAll' : [],
+                  'addTgt' : ['uri', 'ccReq', 'lirid'],
+                  'remTgt' : ['uri'],
+                  'updTgt' : ['uri', 'ccReq', 'lirid']}
     def connectionMade(self):
         log.msg("generate a connection, self is " + str(self))
         self.cmd_queue = self.factory.cmd_queue
@@ -104,6 +112,8 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         self.x1CliFac = self.factory.x1CliFac
         self.x1tcp = self.factory.x1tcp
         self.cmd_queue.get().addCallback(self.x1RespReceived)
+        xmlstream.XmlStream.connectionMade(self)
+        
 
     def onDocumentStart(self, rootElement):
         if 'cmd' == rootElement.name:
@@ -158,13 +168,13 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         if self.state.x1TcpConn == TcpConn.disconnected:
             self.state.x1TcpConn = TcpConn.connecting
             from twisted.internet import reactor
+            self.cmd_queue.get().addCallback(self.x1RespReceived)
             self.factory.x1tcp = reactor.connectTCP(config.ipAddress_IAP, config.x1InterfacePort, self.x1CliFac)
             self.x1_queue.put(ReqMsg(expectedRes = X1ProtocolNegotiation.protocolSelectionResult, content = li_xml_temp.start()))
         else:
             log.msg("%s: wrong tcp status: %s" % (self, self.state.x1TcpConn))
             Response = self.cmd_resp("failure", "wrong tcp status: %s" % self.state.x1TcpConn)
             self.send(Response) 
-
     def _done_start(self, respMsg):
         Str = str(respMsg.content)
         if respMsg.result == 'Unexpected':
@@ -195,7 +205,6 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
             log.msg("%s: wrong tcp status: %s" % (self, self.state.x1TcpConn))
             Response = self.cmd_resp("failure", "wrong tcp status: %s" % self.state.x1TcpConn)
             self.send(Response) 
-
     def _done_stop(self, respMsg): #recv endSessionRequest
         log.msg('recv from x1 client:', str(respMsg.content))
         if respMsg.result == 'Unexpected':
@@ -211,8 +220,7 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         self.state.x1TcpConn = TcpConn.disconnected
         self.factory.x1tcp.disconnect()
         log.msg('x1 has been disconnected.')
-        self.send(self.cmd_resp('success', 'tcp has been disconnected.'))            
-    
+        self.send(self.cmd_resp('success', 'tcp has been disconnected.'))             
     def __proceed_cmdRequest(self, expectedResult, x1ReqXml):
         if self.state.x1TcpConn == TcpConn.connected:
             self.x1_queue.put(ReqMsg(expectedRes = expectedResult, content = x1ReqXml))
@@ -221,12 +229,10 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
             log.msg("%s: wrong tcp status: %s" % (self, self.state.x1TcpConn))
             Response = self.cmd_resp("failure", "wrong tcp status: %s" % self.state.x1TcpConn)
             self.send(Response)           
-                    
-        
-    def _do_intCfg(self, Elements):   
+    def _do_intCfgX2X3(self, Elements):   
         self.__proceed_cmdRequest(expectedResult = X1AdmMsgs.interfConfResponse, x1ReqXml = li_xml_temp.intCfgX2X3())   
-
-    
+    def _do_intCfgX2(self, Elements):   
+        self.__proceed_cmdRequest(expectedResult = X1AdmMsgs.interfConfResponse, x1ReqXml = li_xml_temp.intCfgX2())   
     def __proceed_x1Response(self, respMsg):
         Str = str(respMsg.content)
         log.msg('recv from x1 client:', Str)
@@ -249,11 +255,11 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
             Resp = self.cmd_resp('failure', Str)
         log.msg("self is " + str(self))   
         log.msg('generate Resp %s' % Resp)
-        self.transport.write(Resp)
-                        
-    def _done_intCfg(self, respMsg):
+        self.transport.write(Resp)        
+    def _done_intCfgX2(self, respMsg):
         self.__proceed_x1Response(respMsg)
-    
+    def _done_intCfgX2X3(self, respMsg):
+        self.__proceed_x1Response(respMsg)   
     def __storetgt2dict(self, Elements):
         d = {}
         for k, v in Elements:
@@ -270,7 +276,6 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
                 d[k] = int(v[0])
 
         return d
-        
     def _do_addTgt(self, Elements):
         d = self.__storetgt2dict(Elements)
         uri = d['uri']
@@ -279,20 +284,16 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         self.state.x1Seq += 1    
         self.__proceed_cmdRequest(expectedResult=X1AdmMsgs.addTargetResp, 
                                   x1ReqXml = li_xml_temp.addTgtUri(self.state.x1Seq, uri, lirid, ccReq))
-
     def _done_addTgt(self, respMsg):
         self.__proceed_x1Response(respMsg)
-
     def _do_remTgt(self, Elements):
         d = self.__storetgt2dict(Elements)
         uri = d['uri']
         self.state.x1Seq += 1       
         self.__proceed_cmdRequest(expectedResult=X1AdmMsgs.removeTargetResp, 
                                   x1ReqXml = li_xml_temp.remTgtUri(self.state.x1Seq, uri))
-    
     def _done_remTgt(self, respMsg):
         self.__proceed_x1Response(respMsg)
-    
     def _do_updTgt(self, Elements):
         d = self.__storetgt2dict(Elements)
         uri = d['uri']
@@ -301,40 +302,22 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         self.state.x1Seq += 1
         self.__proceed_cmdRequest(expectedResult=X1AdmMsgs.updateTargetResp, 
                                   x1ReqXml = li_xml_temp.updTgtUri(self.state.x1Seq, uri, lirid, ccReq))
-    
     def _done_updTgt(self, respMsg):
         self.__proceed_x1Response(respMsg)
-    
     def _do_audReq(self, Elements):
         d = self.__storetgt2dict(Elements)
         uri = d['uri']
         self.state.x1Seq += 1
-        if None == uri:
-            AudReq = li_xml_temp.audAllTgt(self.state.x1Seq)
-        else:
-            AudReq = li_xml_temp.audTgtUri(self.state.x1Seq, uri)
+        AudReq = li_xml_temp.audTgtUri(self.state.x1Seq, uri)
         self.__proceed_cmdRequest(expectedResult=X1AdmMsgs.auditResponse, x1ReqXml = AudReq)
-    
     def _done_audReq(self, respMsg):
         self.__proceed_x1Response(respMsg)
-        
-    def _do_x2Msgs(self, Elements):
-        d = self.__storetgt2dict(Elements)
-        num = d['num']
-        self.x2_queue.put(ReqMsg(expectedRes = 'x2Msgs', content = num))
-        
-    
-    def _done_x2Msgs(self, respMsg):
-        self.factory.action = None
-        log.msg('expected X2 message number', respMsg.content, 'get X2 message number', len(respMsg.result))
-        if respMsg.content == len(respMsg.result):
-            Resp = self.cmd_resp('success', str(respMsg.result))
-        else:
-            log.msg('get X2 messages', respMsg.result)
-            Resp = self.cmd_resp('failure', str(respMsg.result))
-        log.msg('generate Resp %s' % Resp)
-        self.send(Resp)
-                    
+    def _do_audAll(self, Elements):
+        self.state.x1Seq += 1
+        AudReq = li_xml_temp.audAllTgt(self.state.x1Seq)
+        self.__proceed_cmdRequest(expectedResult=X1AdmMsgs.auditResponse, x1ReqXml = AudReq)
+    def _done_audAll(self, respMsg):
+        self.__proceed_x1Response(respMsg)     
     def x1RespReceived(self, respMsg=RespMsg()):
         if respMsg.type == 'tcp':
             log.msg('X1 recv tcp status: ', respMsg.result)
@@ -342,13 +325,6 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
         elif respMsg.type == 'cmd':
             self.done(self.state.action, respMsg)
 #         self.cmd_queue.get().addCallback(self.x1RespReceived)
-        
-    def x2RespReceived(self, respMsg = RespMsg()):
-        if respMsg.type == 'cmd':
-            self.done(self.state.action, respMsg)
-        
-#         self.cmd2_queue.get().addCallback(self.x2RespReceived)
-    
     def check_cmd(self, Elements):
         (Result, Values) = self.check_tuple('action', Elements)
         if Result == False:
@@ -366,10 +342,9 @@ class CmdProxyServerProtocol(xmlstream.XmlStream):
             if Result == False:
                 return (False, None)
         return (True, Action)
-    
     def cmd_resp(self, result= 'success', comment=""):
         from common.multixmlstream import generateXml as xml
-        return xml('cmd', [('result',result)])
+        return xml('cmd', [('result',result), ('comment', comment)])
                          
 from twisted.internet.protocol import ServerFactory
 from twisted.internet.defer import DeferredQueue
@@ -385,8 +360,6 @@ class CmdProxyFactory(ServerFactory):
         self.x1CliFac = X1ClientFactory(self.cmd_queue, self.x1_queue, self.state)
         self.x1tcp = None
         
-        self.cmd2_queue = DeferredQueue()
-        self.x2_queue = DeferredQueue()
         self.x2CliFac = X2ServerFactory(self.cmd2_queue, self.state)
         self.x2tcp = None
         from twisted.internet import reactor

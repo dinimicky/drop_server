@@ -25,8 +25,6 @@ class LiClientProtocol(MultiXmlStream):
         e = self.Elements
         MultiXmlStream.onDocumentEnd(self)
         _Bool, Result= self.check_tuple(u'result', e)
-        print e
-        print Result
         if u'success' in Result[0]:
             print 'success'
         else:
@@ -52,12 +50,13 @@ import optparse
 
 CmdFormat = {'start' : [],
              'stop' : [],
-             'intCfg' : [],
-             'audTgt' : ['uri'],
+             'intCfgX2' : [],
+             'intCfgX2X3' : [],
+             'audReq' : ['uri'],
+             'audAll' : [],
              'addTgt' : ['uri', 'ccReq', 'lirid'],
              'remTgt' : ['uri'],
-             'updTgt' : ['uri'],
-             'x2Msgs' : ['num']}
+             'updTgt' : ['uri', 'ccReq', 'lirid']}
 def parse_args():
     usage = """usage: %prog [options] [hostname]:port
 this is the hello client generator.

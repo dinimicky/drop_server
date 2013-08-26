@@ -29,18 +29,12 @@ What kind of command is specified?
 
 intChgX2:
 <cmd>
-    <action>intChg</action>
-    <x2IP>127.0.0.1</x2IP>
-    <x2Port>11111<x2Port> 
+    <action>intChgX2</action>
 </cmd>
 
 intChgX2X3:
 <cmd>
-    <action>intChg</action>
-    <x2IP>127.0.0.1</x2IP>
-    <x2Port>11111<x2Port>
-    <x3IP>127.0.0.1</x3IP>
-    <x3Port>22222<x3Port>    
+    <action>intChgX2X3</action>  
 </cmd>
 
 
@@ -53,8 +47,8 @@ audReq:
 audAll:
 <cmd>
     <action>audAll</action> 
-    <uri>sip:123@163.com</uri>
 </cmd>
+
 addTarget:
 <cmd>
     <action>addTgt</action>

@@ -159,6 +159,9 @@ class MultiXmlStream(xmlstream.XmlStream):
                 Result.append(values)
            
         return (Bool, Result)
+    
+    def Elements2Xml(self):
+        pass
 
 
 def test_generateXmlFromList():

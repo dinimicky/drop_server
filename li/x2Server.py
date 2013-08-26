@@ -6,6 +6,7 @@ Created on 2013-2-25
 from twisted.internet.protocol import ServerFactory
 from twisted.python import log
 from common.multixmlstream import MultiXmlStream
+from common.multixmlstream import generateXmlFromList as toXML
 from common import config
 from common.state import Ping
 from common.log import X2Log
@@ -23,7 +24,6 @@ class X2ServerProtocol(MultiXmlStream):
         Elements = self.Elements
         if 'pingRequest' in str(Elements):
             log.msg('recv pingRequest')
-            self.factory.x2LogHandler.msg(str(Elements))
             (_, Payloads) = self.check_tuple('payload', Elements)
             Payload = Payloads[0]
             log.msg('get the payload:', Payload)
@@ -37,15 +37,16 @@ class X2ServerProtocol(MultiXmlStream):
             self.send(Resp)
             log.msg('send out ping resp:', Resp)
         else:#SipMessage
-            log.msg('recv X2 Notify Message:', str(Elements))
-            self.factory.x2LogHandler.msg(str(Elements))
+            log.msg('recv X2 Notify Message:', toXML(Elements))
+            self.factory.x2LogHandler.msg(toXML([('LIC-Msg', Elements)]))
         MultiXmlStream.onDocumentEnd(self)
             
 class X2ServerFactory(ServerFactory):
     protocol = X2ServerProtocol
     def __init__(self):
-        self.logFileHandler = open(config.x2InterfaceLog, "w")
-        self.x2LogHandler = X2Log(self.logFileHandler)
+        import os.path
+        Dir, Fn = os.path.split(config.x2InterfaceLog)
+        self.x2LogHandler = X2Log(Fn, Dir)
         
     
         

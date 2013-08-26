@@ -125,11 +125,15 @@ print d.__dict__
 print "================================="
 dq=DeferredQueue()
 dq.get().addCallback(Test.classPrint, "Test1")
-
+dq.get().addCallback(Test.classPrint, "Test2")
 print dq.__dict__
 dq.put("test1")
 print dq.__dict__
 dq.put("test2")
 print dq.__dict__
-dq.get().addCallback(Test.classPrint, "Test2")
+dq.put("test3")
+print dq.__dict__
+dq.get().addCallback(Test.classPrint, "Test3")
+print dq.__dict__
+
 print dq.__dict__
