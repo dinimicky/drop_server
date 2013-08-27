@@ -286,6 +286,58 @@ def pingX2Resp(
     return Ping % (config.Lic_ObjectId, config.LI_IRI_ObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor,  
                    SeqNbr)
 
+Start_Resp = '''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <payload>
+      <protocolNegotiation>
+         <protocolSelectionResult>
+            <protocolSelectionList>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.1.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.2.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+               <LIC-ProtocolSelection>
+                  <protocol>0.4.0.127.0.5.3.3.1</protocol>
+                  <selectedProtocolVersion>
+                     <major>1</major>
+                     <minor>0</minor>
+                  </selectedProtocolVersion>
+               </LIC-ProtocolSelection>
+            </protocolSelectionList>
+         </protocolSelectionResult>
+      </protocolNegotiation>
+   </payload>
+</LIC-Msg>
+'''
+    
+X1_Ping_Resp = '''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <protVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </protVersion>
+   <payload>
+      <ping>
+         <pingType><pingResponse/></pingType>
+         <seqNbr>1</seqNbr>
+      </ping>
+   </payload>
+</LIC-Msg>
+'''
 if __name__ == "__main__":
     print start()
     print intCfgX2()

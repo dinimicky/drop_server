@@ -30,7 +30,7 @@ x3InterfacePort = 32345
 cmdServerPort = 33333
 
 x2InterfaceLog = "./x2.log"
-pingEnable = False
+pingEnable = True
 ping_timeout = 60
 ping_delay = 30
 

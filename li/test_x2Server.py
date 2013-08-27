@@ -4,11 +4,9 @@ Created on 2013-3-4
 @author: ezonghu
 '''
 from twisted.trial import unittest
-from common.multixmlstream import MultiXmlStream
-from twisted.internet import protocol, defer
-from common import config
 from li import x2Server 
 from twisted.python import log
+from twisted.test import proto_helpers
 pingReq = '''
 <LIC-Msg>
    <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
@@ -82,81 +80,17 @@ a=rtpmap:8 PCMA/8000
    </payload>
 </LIC-Msg>
 '''
-class LiClientProtocol(MultiXmlStream):
-    def __init__(self):
-        MultiXmlStream.__init__(self)
-    def connectionMade(self):
-        self.requests = self.factory.requests
-        MultiXmlStream.connectionMade( self)
-        log.msg('connection made, send request')
-        self.send(self.requests.pop(0))
-        if self.requests == []:
-            self.factory.checkResult('OK')
-            self.transport.loseConnection()
-               
-    def onDocumentEnd(self):
-        e = self.Elements
-        MultiXmlStream.onDocumentEnd(self)
-        if [] != self.requests:
-            log.msg('in doc end, send out request')
-            self.send(self.requests.pop(0))
-        else:
-            self.factory.checkResult(e)
-            self.transport.loseConnection()
-            from twisted.internet import reactor
-            reactor.stop()
-        
-
-class LiClientFactory(protocol.ClientFactory):
-    protocol = LiClientProtocol
-    def __init__(self, requests):
-        self.requests = requests
-        self.deferred = defer.Deferred()
-        
-    def checkResult(self, Elements):
-        if self.deferred is not None:
-            d, self.deferred = self.deferred, None
-            d.callback(Elements)
-           
-    def clientConnectionFailed(self, connector, reason):
-        if self.deferred is not None:
-            d, self.deferred = self .deferred, None
-            d.errback(reason)
-#            from twisted.internet import reactor
-#            reactor.stop()
-          
-    clientConnectionLost = clientConnectionFailed
-
-def LiClient(host, port, requests):
-    factory = LiClientFactory(requests)
-    from twisted.internet import reactor
-    reactor.connectTCP(host, port, factory)
-    return factory.deferred
-
-class Test(unittest.TestCase):
+class x2ServerTestCase(unittest.TestCase):
     def setUp(self):
-        from twisted.internet import reactor
         import sys
         log.startLogging(sys.stdout)
-        self.x2Server = x2Server.X2ServerFactory()
-        self.x2ServerPort = reactor.listenTCP(config.x2InterfacePort, self.x2Server, interface = config.ipAddress_LITT)
-
-    def tearDown(self):
-        x2ServerPort, self.x2ServerPort = self.x2ServerPort, None
-        x2ServerPort.stopListening()
-
-
-    def testPing(self):
-        d = LiClient(config.ipAddress_LITT, config.x2InterfacePort, [pingReq])
-        def get_resp(Keys):
-            log.msg("recv key: %s" % str(Keys))
-            self.assertIn('OK', str(Keys))
- 
-        return d.addCallback(get_resp)
- 
-    def testX2Msgs(self):
-        d = LiClient(config.ipAddress_LITT, config.x2InterfacePort, [x2Msg])
-     
-        return d
-
+        factory = x2Server.X2ServerFactory()
+        self.proto = factory.buildProtocol(('127.0.0.1', 0))
+        self.tr = proto_helpers.StringTransport()
+        self.proto.makeConnection(self.tr)
+          
+    def test_ping(self):
+        self.proto.dataReceived("%s" % pingReq)
+        self.assertIn("pingResponse", self.tr.value())
+        
 
