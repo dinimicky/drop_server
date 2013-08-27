@@ -7,7 +7,7 @@ from twisted.internet import task
 from twisted.trial import unittest
 from twisted.test import proto_helpers
 from twisted.python import log
-from li.x1client import X1ClientFactory, X1ClientTimeoutError
+from li.x1client import X1ClientFactory, X1ClientTimeoutError, X1PingTimeoutError
 from twisted.internet.defer import DeferredQueue
 from common.state import State, TcpConn, ReqMsg, X1ProtocolNegotiation
 from lixml import li_xml_temp
@@ -26,7 +26,6 @@ class X1ClientTest(unittest.TestCase):
         state = State()
         factory = X1ClientFactory(cmd_queue, x1_queue, state)
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
-        from common import config
         config.pingEnable = False 
         
         
@@ -64,16 +63,17 @@ class X1ClientTest(unittest.TestCase):
         d.addCallback(self.check_result, 'OK')
         return d
     
-    def test_1ping(self):
+    def test_a_ping(self):
         self.test_connection()
         self.proto.sendPingRequest()
         self.assertIn("pingRequest", self.tr.value())
-        self.assertEqual(self.proto.pingReq - self.proto.pingResp, 1)
         self.tr.clear()
+        (d, _pingCallID) = self.proto.pingResult[0]
         self.proto.dataReceived(li_xml_temp.X1_Ping_Resp)
-        self.assertEqual(self.proto.pingReq - self.proto.pingResp, 0)
+        return self.assertIn('pingResponse', d.result)
         
     def test_start_timeout(self):
+        self.proto.timeOut = 1
         self.test_connection()
         Start = ReqMsg(expectedRes = X1ProtocolNegotiation.protocolSelectionResult, content = li_xml_temp.start())
         self.proto.factory.x1_queue.put(Start)
@@ -84,13 +84,15 @@ class X1ClientTest(unittest.TestCase):
         return self.assertFailure(d, X1ClientTimeoutError)
         
     def test_ping_timeout(self):
+        config.ping_delay=1
+        config.ping_timeout=2
+        config.pingEnable = True
         self.test_connection()
-        self.proto.sendPingRequest()
-        (d, _callID) = self.proto.result[0]
         self.assertIn("pingRequest", self.tr.value())
-        self.assertEqual(self.proto.pingReq - self.proto.pingResp, 1)
+        (d, _pingCallID) = self.proto.pingResult[0]
         self.tr.clear()
-        self.clock.advance(self.proto.timeOut)
-        return self.assertFailure(d, X1ClientTimeoutError)
+        self.clock.advance(config.ping_timeout)
+        d.addCallback(self.proto.connectionLost)
+        return d.addCallback(self.assertFailure, X1PingTimeoutError)
 
 
