@@ -19,7 +19,7 @@ class X1ClientTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.tr = proto_helpers.StringTransportWithDisconnection()
+        self.tr = proto_helpers.StringTransport()
         self.clock = task.Clock()
         cmd_queue = DeferredQueue()
         x1_queue = DeferredQueue()
@@ -92,7 +92,6 @@ class X1ClientTest(unittest.TestCase):
         (d, _pingCallID) = self.proto.pingResult[0]
         self.tr.clear()
         self.clock.advance(config.ping_timeout)
-        d.addCallback(self.proto.connectionLost)
-        return d.addCallback(self.assertFailure, X1PingTimeoutError)
+        return self.assertFailure(d, X1PingTimeoutError)
 
 

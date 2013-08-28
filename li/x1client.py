@@ -34,7 +34,7 @@ class X1ClientProtocol(MultiXmlStream):
         self.x1_queue.get().addCallback(self.cmdReceived)
         if config.pingEnable:
             self.lcping = task.LoopingCall(self.sendPingRequest)
-            self.lcping.start(config.ping_delay, True)
+            self.lcping.start(config.ping_delay)
         MultiXmlStream.connectionMade(self)
         
     def sendPingRequest(self):
@@ -50,14 +50,20 @@ class X1ClientProtocol(MultiXmlStream):
             self.pingResult.append((d, pingCallID))
     
     def _ping_cancel(self, d):
-        log.msg("x1 ping response is not received, x1Seq =", self.state.x1Seq) 
+        log.msg("x1 ping response is not received ")
+        log.msg(X1PingTimeoutError()) 
         d.errback(X1PingTimeoutError())
+        lcping, self.lcping = self.lcping, None
+        lcping.stop()
+        self.transport.loseConnection()
         
     def _cancel(self, d):
         log.msg("X1 did't receive response. request:%s." % self.reqMsg.content)
         self.reqMsg = None
         self.cmd_queue.put(RespMsg(result="Unavailable", content=None))
+        log.msg(X1ClientTimeoutError())
         d.errback(X1ClientTimeoutError())
+        self.transport.loseConnection()
         
     def _sendX1Xml(self, xml):
         d = defer.Deferred()
@@ -86,14 +92,17 @@ class X1ClientProtocol(MultiXmlStream):
             d, pingCallID = self.pingResult.pop(0)
             pingCallID.cancel()
             d.callback(str(Elements))
-            log.msg('recv ping response: %s' % str(Elements))            
+            log.msg('recv ping response: x1Seq = %d' % self.state.x1Seq)            
         else:
             log.msg("recv unexpected message:%s" % str(Elements))
 #            self.factory.cmd_queue.put(RespMsg(result="Unexpected", content=Elements))
         MultiXmlStream.onDocumentEnd(self)
     def connectionLost(self, Why):
         log.msg("connnect is lost, reason:%s" % Why)
-        self.lcping.stop()
+        if self.lcping is not None:
+            self.lcping.stop()
+        log.msg('server existed')
+        reactor.stop()
         if self.x1_queue:
             self.x1_queue = None
         return Why
@@ -103,6 +112,3 @@ class X1ClientFactory(ClientFactory):
         self.cmd_queue = cmd_queue
         self.x1_queue = x1_queue
         self.state = state
-
-        
-        
