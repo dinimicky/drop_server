@@ -52,7 +52,7 @@ class CmdProxyTest(unittest.TestCase):
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
         
-    def test_intCfgX2(self):
+    def test_intCfgX2_success(self):
         self.test_start()
         self.cmdConnection()
         self.cmdProto.dataReceived(Requests['intCfgX2'])
@@ -62,7 +62,7 @@ class CmdProxyTest(unittest.TestCase):
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
 
-    def test_intCfgX2X3(self):
+    def test_intCfgX2X3_success(self):
         self.test_start()
         self.cmdConnection()
         self.cmdProto.dataReceived(Requests['intCfgX2X3'])
