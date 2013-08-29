@@ -19,13 +19,14 @@ class X1ClientTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.tr = proto_helpers.StringTransport()
+        self.tr = proto_helpers.StringTransportWithDisconnection()
         self.clock = task.Clock()
         cmd_queue = DeferredQueue()
         x1_queue = DeferredQueue()
         state = State()
         factory = X1ClientFactory(cmd_queue, x1_queue, state)
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
+        self.tr.protocol = self.proto
         config.pingEnable = False 
         
         
@@ -91,7 +92,7 @@ class X1ClientTest(unittest.TestCase):
         self.assertIn("pingRequest", self.tr.value())
         (d, _pingCallID) = self.proto.pingResult[0]
         self.tr.clear()
-        self.clock.advance(config.ping_timeout)
+        self.clock.advance(config.ping_timeout+1)
         return self.assertFailure(d, X1PingTimeoutError)
 
 

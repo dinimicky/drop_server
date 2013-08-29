@@ -51,17 +51,13 @@ class X1ClientProtocol(MultiXmlStream):
     
     def _ping_cancel(self, d):
         log.msg("x1 ping response is not received ")
-        log.msg(X1PingTimeoutError()) 
         d.errback(X1PingTimeoutError())
-        lcping, self.lcping = self.lcping, None
-        lcping.stop()
         self.transport.loseConnection()
         
     def _cancel(self, d):
         log.msg("X1 did't receive response. request:%s." % self.reqMsg.content)
         self.reqMsg = None
         self.cmd_queue.put(RespMsg(result="Unavailable", content=None))
-        log.msg(X1ClientTimeoutError())
         d.errback(X1ClientTimeoutError())
         self.transport.loseConnection()
         
@@ -99,8 +95,10 @@ class X1ClientProtocol(MultiXmlStream):
         MultiXmlStream.onDocumentEnd(self)
     def connectionLost(self, Why):
         log.msg("connnect is lost, reason:%s" % Why)
-        if self.lcping is not None:
-            self.lcping.stop()
+        
+        if hasattr(self, 'lcping') and self.lcping is not None:
+            lcping, self.lcping = self.lcping, None
+            lcping.stop()
         log.msg('server existed')
         reactor.stop()
         if self.x1_queue:
