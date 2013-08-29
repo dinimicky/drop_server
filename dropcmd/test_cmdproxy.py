@@ -3,104 +3,56 @@ Created on 2013-2-28
 
 @author: ezonghu
 '''
-from twisted.trial import unittest
-from common.multixmlstream import MultiXmlStream
 from twisted.internet import protocol, defer
 from common import config
+from dropClient import Requests
+from twisted.trial import unittest
 from dropcmd import cmdproxy
+from li import x1client
+from lixml import li_xml_temp
 from twisted.python import log
-class LiServerProtocol(MultiXmlStream):
-    def __init__(self):
-        self.counter = 1
-        MultiXmlStream.__init__(self)
-        
-    def onDocumentEnd(self):
-        if self.factory.cmds != []:
-            self.send(self.factory.cmds.pop(0))
-            self.counter += 1
-        MultiXmlStream.onDocumentEnd(self)
-    def connectionLost(self, reason):
-        MultiXmlStream.connectionLost(self, reason)
-        
-class LiServerFactory(protocol.ServerFactory):
-    protocol = LiServerProtocol
-    def __init__(self, cmds = []):
-        self.cmds = cmds
-    
+from twisted.test import proto_helpers
+import sys
 
-class LiClientProtocol(MultiXmlStream):
-    def __init__(self):
-        MultiXmlStream.__init__(self)
-    def connectionMade(self):
-        self.requests = self.factory.requests
-        MultiXmlStream.connectionMade( self)
-        self.send(self.requests.pop(0))
-               
-    def onDocumentEnd(self):
-        e = self.Elements
-        MultiXmlStream.onDocumentEnd(self)
-        if [] != self.requests:
-            self.send(self.requests.pop(0))
-        else:
-            self.factory.checkResult(e)
-            self.transport.loseConnection()
-        
+log.startLogging(sys.stdout)
 
-class LiClientFactory(protocol.ClientFactory):
-    protocol = LiClientProtocol
-    def __init__(self, requests):
-        self.requests = requests
-        self.deferred = defer.Deferred()
-        
-    def checkResult(self, Elements):
-        if self.deferred is not None:
-            d, self.deferred = self.deferred, None
-            d.callback(Elements)
-           
-    def clientConnectionFailed(self, connector, reason):
-        if self.deferred is not None:
-            d, self.deferred = self .deferred, None
-            d.errback(reason)
-#            from twisted.internet import reactor
-#            reactor.stop()
-          
-    clientConnectionLost = clientConnectionFailed
-
-def LiClient(host, port, requests):
-    factory = LiClientFactory(requests)
-    from twisted.internet import reactor
-    reactor.connectTCP(host, port, factory)
-    return factory.deferred
-
-class Test(unittest.TestCase):
-    Requests = ['<cmd> <action>start</action></cmd> ',
-                ' <cmd><action>intCfg</action> </cmd>',
-                ' <cmd><action>addTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
-                ' <cmd><action>audReq</action> <uri/></cmd> ',
-                ' <cmd><action>audReq</action> <uri>sip:123@163.com</uri></cmd> ',
-                ' <cmd><action>updTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
-                ' <cmd><action>remTgt</action> <uri>sip:123@163.com</uri></cmd>',
-                ' <cmd><action>x2Msgs</action><num>0</num></cmd>',
-                ' <cmd><action>stop</action> </cmd>',
-                ]
+class newCmdProxyFactory(cmdproxy.CmdProxyFactory):
+    def _start_x2_server(self):
+        return
+class CmdProxyTest(unittest.TestCase):
 
     def setUp(self):
-        from twisted.internet import reactor
-        import sys
-        log.startLogging(sys.stdout)
-        self.liServer = LiServerFactory()
-        self.liServerPort = reactor.listenTCP(config.x1InterfacePort, self.liServer, interface = config.ipAddress_IAP)
-        self.liProxy = cmdproxy.CmdProxyFactory()
-        self.liProxyPort = reactor.listenTCP(config.cmdServerPort, self.liProxy, interface = config.ipAddress_LITT)
+        config.pingEnable = False
+        self.cmd_tr = proto_helpers.StringTransportWithDisconnection()
+        self.x1_tr = proto_helpers.StringTransportWithDisconnection()
+        cmdFac = newCmdProxyFactory()
 
-    def tearDown(self):
-        liServerPort, self.liServerPort = self.liServerPort, None
-        liServerPort.stopListening()
-        self.liProxy.x2tcp.stopListening()
-        liProxyPort, self.liProxyPort = self.liProxyPort, None
-        liProxyPort.stopListening()
+        self.cmdProto = cmdFac.buildProtocol(('127.0.0.1', 0))
+        self.cmd_tr.protocol = self.cmdProto
         
-
+        self.cmdProto.makeConnection(self.cmd_tr)
+        def start_x1_client():
+            x1fac = x1client.X1ClientFactory(self.cmdProto.factory.cmd_queue, 
+                                             self.cmdProto.factory.x1_queue, 
+                                             self.cmdProto.factory.state)
+            self.x1Proto = x1fac.buildProtocol(('127.0.0.1', 0))
+            self.cmd_tr.protocol = self.x1Proto
+            self.x1Proto.makeConnection(self.x1_tr)
+        self.cmdProto._start_x1_client = start_x1_client
+            
+    def tearDown(self):
+        pass
+        
+    def test_start(self):
+        self.cmdProto.dataReceived(Requests['start'])
+        self.assertIn('protocolProposal', self.x1_tr.value())
+        log.msg("x1client send out: start\n %s" % self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.Start_Resp)
+        log.msg("cmdclient send out: %s" % self.cmd_tr.value())
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+        
 
 #    def test_start(self):
 #        def createprotocolNegotiation():
@@ -121,20 +73,6 @@ class Test(unittest.TestCase):
 #            self.fail(Keys)
 #        return d.addCallback(get_resp)
                   
-
-    def test_all_success(self):
-        import dropResp
-        self.liServer.cmds = dropResp.resp
-        d = LiClient(config.ipAddress_LITT, config.cmdServerPort, Test.Requests[:])
-        def get_resp(Keys):
-            log.msg("recv key: %s" % str(Keys))
-            for (k, v) in Keys:
-                if 'result'== k:
-                    log.msg('get result: %s:%s' % (k, v[0]))
-                    self.assertEqual("success", v[0])
-                    return
-            self.fail(Keys)
-        return d.addCallback(get_resp)
 
     
 
