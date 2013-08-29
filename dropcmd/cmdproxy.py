@@ -9,7 +9,7 @@ from common import config
 from common.state import State, TcpConn, ReqMsg, RespMsg, X1ProtocolNegotiation, X1AdmMsgs
 from lixml import li_xml_temp
 from twisted.python import log
-import types
+
 '''
 drop_server
 ===========
@@ -221,7 +221,7 @@ class CmdProxyServerProtocol(MultiXmlStream):
         self.state.action = None
         if respMsg.result == "Unavailable":
             log.msg("X1 did't receive response.")
-            Resp = self.send_cmd_resp('failure', "X1 did't receive response.")
+            self.send_cmd_resp('failure', "X1 did't receive response.")
             
             return 
 
