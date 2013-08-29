@@ -3,7 +3,7 @@ Created on 2013-2-28
 
 @author: ezonghu
 '''
-from twisted.internet import protocol, defer
+
 from common import config
 from dropClient import Requests
 from twisted.trial import unittest
@@ -25,9 +25,10 @@ class CmdProxyTest(unittest.TestCase):
         config.pingEnable = False
         self.cmd_tr = proto_helpers.StringTransportWithDisconnection()
         self.x1_tr = proto_helpers.StringTransportWithDisconnection()
-        cmdFac = newCmdProxyFactory()
-
-        self.cmdProto = cmdFac.buildProtocol(('127.0.0.1', 0))
+        self.cmdFac = newCmdProxyFactory()
+        self.cmdConnection()
+    def cmdConnection(self):
+        self.cmdProto = self.cmdFac.buildProtocol(('127.0.0.1', 0))
         self.cmd_tr.protocol = self.cmdProto
         
         self.cmdProto.makeConnection(self.cmd_tr)
@@ -46,33 +47,27 @@ class CmdProxyTest(unittest.TestCase):
     def test_start(self):
         self.cmdProto.dataReceived(Requests['start'])
         self.assertIn('protocolProposal', self.x1_tr.value())
-        log.msg("x1client send out: start\n %s" % self.x1_tr.value())
         self.x1_tr.clear()
         self.x1Proto.dataReceived(li_xml_temp.Start_Resp)
-        log.msg("cmdclient send out: %s" % self.cmd_tr.value())
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
         
+    def test_intCfgX2(self):
+        self.test_start()
+        self.cmdConnection()
+        self.cmdProto.dataReceived(Requests['intCfgX2'])
+        self.assertIn('interfConfRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.IntCfgX2_Resp)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
 
-#    def test_start(self):
-#        def createprotocolNegotiation():
-#            from lixml import li_lic as lic
-#            prt = lic.protocolProposal(lic.LIC_ProtocolProposal(config.LI_ADM_ObjectId, lic.ProtocolVersion(minor=0)) + 
-#                                       lic.LIC_ProtocolProposal(config.LI_IRI_ObjectId, lic.ProtocolVersion(minor=0)) +
-#                                       lic.LIC_ProtocolProposal(config.LI_CC_ObjectId, lic.ProtocolVersion(minor=0)))
-#            return lic.LIC_Msg(config.Lic_ObjectId, config.Lic_ProtObjectId, '<protocolSelectionResult>'+prt+'</protocolSelectionResult>')
-#        self.liServer.cmd = createprotocolNegotiation()
-#        d = LiClient(config.ipAddress_LITT, config.cmdServerPort, Test.Requests[:2])
-#        def get_resp(Keys):
-#            log.msg("recv key: %s" % str(Keys))
-#            for (k, v) in Keys:
-#                if 'result'== k:
-#                    log.msg('get result: %s:%s' % (k, v[0]))
-#                    self.assertEqual("success", v[0])
-#                    return
-#            self.fail(Keys)
-#        return d.addCallback(get_resp)
-                  
-
-    
-
+    def test_intCfgX2X3(self):
+        self.test_start()
+        self.cmdConnection()
+        self.cmdProto.dataReceived(Requests['intCfgX2X3'])
+        self.assertIn('interfConfRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.IntCfgX2X3_Resp)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()

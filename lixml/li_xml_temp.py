@@ -321,7 +321,64 @@ Start_Resp = '''
    </payload>
 </LIC-Msg>
 '''
-    
+IntCfgX2_Resp = '''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <protVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </protVersion>
+   <payload>
+      <extPDU>
+<LI-ADM-Event>
+   <lI-ADM-MessageSequence>
+      <interfConfResponse>
+         <sendingNodeInfo>
+            <sendingNodeType><mgc/></sendingNodeType>
+            <sendingNodeVersion>
+               <majorVersion>19</majorVersion>
+               <minorVersion>3</minorVersion>
+            </sendingNodeVersion>
+         </sendingNodeInfo>
+         <result><success/></result>
+         <maxNumberOf-LI-ADM-Messages>5</maxNumberOf-LI-ADM-Messages>
+         <warrant-info-valid/>
+      </interfConfResponse>
+   </lI-ADM-MessageSequence>
+</LI-ADM-Event></extPDU>
+   </payload>
+</LIC-Msg>
+'''
+IntCfgX2X3_Resp = '''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <protVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </protVersion>
+   <payload>
+      <extPDU>
+<LI-ADM-Event>
+   <lI-ADM-MessageSequence>
+      <interfConfResponse>
+         <sendingNodeInfo>
+            <sendingNodeType><mgc/></sendingNodeType>
+            <sendingNodeVersion>
+               <majorVersion>19</majorVersion>
+               <minorVersion>3</minorVersion>
+            </sendingNodeVersion>
+         </sendingNodeInfo>
+         <result><success/></result>
+         <maxNumberOf-LI-ADM-Messages>5</maxNumberOf-LI-ADM-Messages>
+         <warrant-info-valid/>
+      </interfConfResponse>
+   </lI-ADM-MessageSequence>
+</LI-ADM-Event></extPDU>
+   </payload>
+</LIC-Msg>
+'''    
 X1_Ping_Resp = '''
 <LIC-Msg>
    <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
