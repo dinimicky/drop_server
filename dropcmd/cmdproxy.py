@@ -169,7 +169,8 @@ class CmdProxyServerProtocol(MultiXmlStream):
             self.transport.loseConnection()
         except:
             return None
-    def _start_x1_client(self):
+
+    def _start_x1_connection(self):
         from twisted.internet import reactor
         self.factory.x1tcp = reactor.connectTCP(config.ipAddress_IAP, config.x1InterfacePort, self.x1CliFac)
                 
@@ -177,7 +178,7 @@ class CmdProxyServerProtocol(MultiXmlStream):
         if self.state.x1TcpConn == TcpConn.disconnected:
             self.state.x1TcpConn = TcpConn.connecting
             self.cmd_queue.get().addCallback(self.x1RespReceived)
-            self._start_x1_client()
+            self._start_x1_connection()
             self.x1_queue.put(ReqMsg(expectedRes = X1ProtocolNegotiation.protocolSelectionResult, content = li_xml_temp.start()))
         else:
             log.msg("%s: wrong tcp status: %s" % (self, self.state.x1TcpConn))

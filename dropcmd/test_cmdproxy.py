@@ -39,7 +39,7 @@ class CmdProxyTest(unittest.TestCase):
             self.x1Proto = x1fac.buildProtocol(('127.0.0.1', 0))
             self.cmd_tr.protocol = self.x1Proto
             self.x1Proto.makeConnection(self.x1_tr)
-        self.cmdProto._start_x1_client = start_x1_client
+        self.cmdProto._start_x1_connection = start_x1_client
             
     def tearDown(self):
         pass
