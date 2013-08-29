@@ -5,24 +5,49 @@ Created on 2013-3-11
 '''
 
 from common.multixmlstream import MultiXmlStream
-
-class CmdClientProtocol(MultiXmlStream):
-    pass
-
+from twisted.protocols import policies
+from twisted.internet import defer
 from twisted.internet.protocol import ClientFactory
-class CmdClientFactory(ClientFactory):
+
+Requests = {'start': '<cmd> <action>start</action></cmd> ',
+            'intCfgX2':' <cmd><action>intCfgX2</action> </cmd>',
+            'intCfgX2X3':' <cmd><action>intCfgX2X3</action> </cmd>',
+            'addTgt':' <cmd><action>addTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
+            'audAll':' <cmd><action>audAll</action></cmd> ',
+            'audReq':' <cmd><action>audReq</action> <uri>sip:123@163.com</uri></cmd> ',
+            'updTgt':' <cmd><action>updTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
+            'remTgt':' <cmd><action>remTgt</action> <uri>sip:123@163.com</uri></cmd>',
+            'stop':' <cmd><action>stop</action> </cmd>',
+            }
+class DropClientTimeoutError(Exception()):
     pass
 
-class LiClientProtocol(MultiXmlStream):
+
+class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
     def __init__(self):
+        self.results = []
+        self.resp = ""
+        self._timeOut = 30
         MultiXmlStream.__init__(self)
+        
+    def timeoutConnection(self):
+        for d in self.results:
+            d.errback(DropClientTimeoutError())
+        self.transport.loseConnection()
+        
     def connectionMade(self):
+        d = defer.Deferred()
+        self.results.append(d)
         self.requests = self.factory.requests
         MultiXmlStream.connectionMade( self)
         self.send(self.requests.pop(0))
+        self.setTimeout(self._timeOut)
+        return d
+        
                
     def onDocumentEnd(self):
         e = self.Elements
+        self.resp = str(self.Elements)
         MultiXmlStream.onDocumentEnd(self)
         _Bool, Result= self.check_tuple(u'result', e)
         if u'success' in Result[0]:
@@ -30,13 +55,16 @@ class LiClientProtocol(MultiXmlStream):
         else:
             print 'failure'
         self.transport.loseConnection()
+
+    def connectionLost(self, Why):
+        MultiXmlStream.connectionLost(self, Why)
         from twisted.internet import reactor
-        reactor.stop()
+        reactor.stop()        
         
 
 class LiClientFactory(ClientFactory):
     protocol = LiClientProtocol
-    def __init__(self, requests):
+    def __init__(self, requests = []):
         self.requests = requests
         
 
