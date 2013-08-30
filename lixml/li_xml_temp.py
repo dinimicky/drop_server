@@ -105,8 +105,8 @@ def intCfgX2X3(X2IP="C0A80E1D", X2Port=22345,
     <maxNumberOf-LI-IRI-Messages>%d</maxNumberOf-LI-IRI-Messages>
     <x2InterfaceAddress><ipV4>%s</ipV4></x2InterfaceAddress>
     <x2InterfacePort>%d</x2InterfacePort>
-    <x3InterfaceAddress><ipV4>%s</ipV4></x2InterfaceAddress>
-    <x3InterfacePort>%d</x2InterfacePort>
+    <x3InterfaceAddress><ipV4>%s</ipV4></x3InterfaceAddress>
+    <x3InterfacePort>%d</x3InterfacePort>
     </interfConfRequest>
     </lI-ADM-MessageSequence>
     </LI-ADM-Event>
