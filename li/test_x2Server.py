@@ -90,7 +90,8 @@ class x2ServerTestCase(unittest.TestCase):
         self.proto.makeConnection(self.tr)
           
     def test_ping(self):
-        self.proto.dataReceived("%s" % pingReq)
+        self.proto.dataReceived("%s" % pingReq[ : -20])
+        self.proto.dataReceived("%s" % pingReq[-20 : ])
         self.assertIn("pingResponse", self.tr.value())
         
 
