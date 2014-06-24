@@ -247,21 +247,18 @@ class CmdProxyServerProtocol(MultiXmlStream):
         log.msg('recv from x1 client:', Str)
         if respMsg.result == 'Unexpected':
             return
-        
         Action, self.state.action = self.state.action, None
         if respMsg.result == "Unavailable":
             log.msg("X1 did't receive response. Current Action:", Action)
-            Resp = self.send_cmd_resp('failure', "X1 did't receive response.")
-            
-            
+            self.send_cmd_resp('failure', "X1 did't receive response.")
             return 
         #check interfConf success or not
         if 'success' in Str:
             log.msg('X1 %s success, the Elements: %s' % (Action, Str))
-            Resp = self.send_cmd_resp('success', Str)
+            self.send_cmd_resp('success', Str)
         else:#meet error
             log.msg('X1 %s failed, the Elements: %s' % (Action,Str))
-            Resp = self.send_cmd_resp('failure', Str)
+            self.send_cmd_resp('failure', Str)
      
     def _done_intCfgX2(self, respMsg):
         self.__proceed_x1Response(respMsg)
