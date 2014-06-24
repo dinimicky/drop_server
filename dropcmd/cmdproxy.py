@@ -262,9 +262,7 @@ class CmdProxyServerProtocol(MultiXmlStream):
         else:#meet error
             log.msg('X1 %s failed, the Elements: %s' % (Action,Str))
             Resp = self.send_cmd_resp('failure', Str)
-        log.msg("self is " + str(self))   
-        log.msg('generate Resp %s' % Resp)
-        self.transport.write(Resp)        
+     
     def _done_intCfgX2(self, respMsg):
         self.__proceed_x1Response(respMsg)
     def _done_intCfgX2X3(self, respMsg):
