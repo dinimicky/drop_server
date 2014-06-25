@@ -1,7 +1,6 @@
 from twisted.python import failure
 from twisted.trial import unittest
 from multixmlstream import MultiXmlStream
-from twisted.words.xish import domish, utility, xmlstream
 from twisted.words.xish.xpath import XPathQuery
 class MultiXmlStreamTest(unittest.TestCase):
     def setUp(self):
