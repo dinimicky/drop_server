@@ -15,4 +15,5 @@ class MultiXmlStream(xmlstream.XmlStream):
         '''
         self.dispatch(self, xmlstream.STREAM_END_EVENT)
         self._initializeStream()
+        self.reqRootElement = None
        
