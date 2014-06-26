@@ -4,7 +4,7 @@ Created on 2013-3-4
 @author: ezonghu
 '''
 from twisted.trial import unittest
-from li import x2Server 
+from li import x2server
 from twisted.python import log
 from twisted.test import proto_helpers
 pingReq = '''
@@ -85,7 +85,7 @@ log.startLogging(sys.stdout)
 class x2ServerTestCase(unittest.TestCase):
     def setUp(self):
 
-        factory = x2Server.X2ServerFactory()
+        factory = x2server.X2ServerFactory()
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
         self.tr = proto_helpers.StringTransport()
         self.proto.makeConnection(self.tr)
