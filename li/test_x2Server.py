@@ -80,18 +80,31 @@ a=rtpmap:8 PCMA/8000
    </payload>
 </LIC-Msg>
 '''
+import sys
+log.startLogging(sys.stdout)
 class x2ServerTestCase(unittest.TestCase):
     def setUp(self):
-        import sys
-        log.startLogging(sys.stdout)
+
         factory = x2Server.X2ServerFactory()
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
         self.tr = proto_helpers.StringTransport()
         self.proto.makeConnection(self.tr)
           
     def test_ping(self):
-        self.proto.dataReceived("%s" % pingReq[ : -20])
-        self.proto.dataReceived("%s" % pingReq[-20 : ])
+        self.proto.dataReceived(pingReq[ : -20])
+        self.proto.dataReceived(pingReq[-20 : ])
         self.assertIn("pingResponse", self.tr.value())
-        
+    
+    def test_IRIEvent(self):
+        class dummyLogHdl(object):
+            def __init__(self):
+                self.List = []
+            def msg(self, ctx):
+                self.List.append(ctx)
+ 
+        self.proto.factory.x2LogHandler = dummyLogHdl()
+        self.proto.dataReceived(x2Msg)
+        self.assertEqual(1, len(self.proto.factory.x2LogHandler.List))
+        log.msg(self.proto.factory.x2LogHandler.List[0])
+        self.assertIn('IRI-Event', self.proto.factory.x2LogHandler.List[0])
 

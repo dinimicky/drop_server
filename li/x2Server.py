@@ -15,50 +15,43 @@ from twisted.words.xish import xmlstream
 from common.multixmlstream import MultiXmlStream
 from twisted.words.xish.xpath import XPathQuery
 from common import config
-from common.state import Ping
 from common.log import X2Log
 from lixml import li_xml_temp
 class X2ServerProtocol(MultiXmlStream):
     X2PingReqPath = XPathQuery('/payload/ping/pingType/pingRequest')
     getX2PingReqSeqNbr = XPathQuery('/payload/ping/seqNbr').queryForString
     X2IRIEvent = XPathQuery('/payload/extPDU/IRI-Event')
+    
     def _genPingResp(self, element):
         SeqNbr = int(X2ServerProtocol.getX2PingReqSeqNbr(element))
+        log.msg("recv X2 Ping request, SeqNbr: %d" % SeqNbr)
         self.pingResp = li_xml_temp.pingX2Resp(SeqNbr)
-        self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, self._sendPingResp)
+        def sendPingResp(SeqNbr, x2ProtInst):
+            x2ProtInst.send(x2ProtInst.pingResp)
+            x2ProtInst.pingResp = None
+            log.msg("send X2 Ping response, SeqNbr: %d" % SeqNbr)
+        self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, sendPingResp, 0, SeqNbr)
         
     def _getIRIEvent(self, element):
+        log.msg('recv X2 message: %s' % X2ServerProtocol.X2IRIEvent.queryForNodes(element)[0].name)
         if self.factory.x2LogHandler is not None:
-            self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, self._recordIRIEvent)
+            def recordIRIEvent(x2ProtInst):
+                x2ProtInst.factory.x2LogHandler.msg(x2ProtInst.reqRootElement.toXml())
+            self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, recordIRIEvent)
         
-    def _recordIRIEvent(self):
-        self.factory.x2LogHandler.msg(self.reqRootElement.toXml())
-        self.reqRootElement = None
-        
-    def _sendPingResp(self, obj):
-        print obj,self
-        if self.pingResp is not None:
-            self.send(self.pingResp)
-            self.pingResp = None
-        self.reqRootElement = None
+
     def __init__(self):
         self.reqRootElement = None
         self.pingResp = None
         MultiXmlStream.__init__(self)
+        self.addObserver(X2ServerProtocol.X2PingReqPath, self._genPingResp)
+        self.addObserver(X2ServerProtocol.X2IRIEvent, self._getIRIEvent)    
     
     def connectionMade(self):
         log.msg('x2 connection is established')
-        self.addObserver(X2ServerProtocol.X2PingReqPath, self._genPingResp)
-        self.addObserver(X2ServerProtocol.X2IRIEvent, self._getIRIEvent)    
         MultiXmlStream.connectionMade(self)
         
-    def onDocumentStart(self, rootElement):
-        self.reqRootElement = rootElement
-        MultiXmlStream.onDocumentStart(self, rootElement)
-    
-    def onElement(self, element):
-        self.reqRootElement.addElement(element)
-        MultiXmlStream.onElement(self, element)
+
         
         
             
