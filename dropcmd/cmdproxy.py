@@ -356,7 +356,7 @@ class CmdProxyServerProtocol(MultiXmlStream):
 from twisted.internet.protocol import ServerFactory
 from twisted.internet.defer import DeferredQueue
 from li.x1client import X1ClientFactory
-from li.x2Server import X2ServerFactory
+from li.x2server import X2ServerFactory
 class CmdProxyFactory(ServerFactory):
     protocol = CmdProxyServerProtocol
 
