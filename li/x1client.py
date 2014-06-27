@@ -19,10 +19,11 @@ class X1ClientProtocol(MultiXmlStream):
     getX1PingRespSeqNbr = XPathQuery('/payload/ping/seqNbr').queryForString
     X1AlarmPath = XPathQuery('/payload/extPDU/LI-ADM-Event/lI-ADM-MessageSequence/alarmNotification')
     callLater = reactor.callLater
-    timeOut = 2
+    timeOut = 30
 
     def connectionMade(self):
         log.msg('x1 tcp connection is made')
+        self.alarmCounter = 0
         self.x1_queue = self.factory.x1_queue
         self.state = self.factory.state
         self.cmd_queue = self.factory.cmd_queue
@@ -33,6 +34,8 @@ class X1ClientProtocol(MultiXmlStream):
             self.lcping.start(config.ping_delay)
         MultiXmlStream.connectionMade(self)
         def recordX1Alarm(element):
+            self.alarmCounter += 1
+            log.msg("recv X1 total alrams: %d" % self.alarmCounter)
             log.msg("recv X1 alarm: %s" % element.toXml())
         self.addObserver(X1ClientProtocol.X1AlarmPath, recordX1Alarm)
           

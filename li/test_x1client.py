@@ -72,11 +72,35 @@ class X1ClientTest(unittest.TestCase):
         self.assertEqual("Unavailable", self.cmd_data[1].result)
         self.assertEqual(1, len(self.proto._xpathObservers[0]))
         
-#     def test_one_ping(self):
-#         self.proto.makeConnection(self.tr)
-#         self.proto.cmd_queue.get().addCallback(self.getCmdData)
+    def test_one_ping(self):
+        self.proto.makeConnection(self.tr)
+        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto._sendPingRequest()
+        self.assertIn("pingRequest", self.tr.value())
+        self.tr.clear()
+        self.assertEqual(2, len(self.proto._xpathObservers[0]))
+        self.proto.dataReceived(li_xml_temp.X1_Ping_Resp)
+        self.assertEqual(1, len(self.proto._xpathObservers[0]))
         
-#     
+    def test_ping_timeout(self):     
+        self.proto.makeConnection(self.tr)
+        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto._sendPingRequest()
+        self.assertIn("pingRequest", self.tr.value())
+        self.tr.clear()
+        Reason = []
+        def connectionLost(Why):
+            Reason.append(Why)
+        self.proto.connectionLost = connectionLost 
+        self.clock.advance(config.ping_timeout)
+        self.assertEqual(1, len(Reason))
+        
+    def test_alarm(self):  
+        self.proto.makeConnection(self.tr)
+        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.dataReceived(li_xml_temp.X1_Alarm)
+        self.assertEqual(1, self.proto.alarmCounter)
+#
 #     def test_a_ping(self):
 #         self.test_connection()
 #         self.proto.sendPingRequest()
