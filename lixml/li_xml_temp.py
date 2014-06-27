@@ -395,6 +395,26 @@ X1_Ping_Resp = '''
    </payload>
 </LIC-Msg>
 '''
+X1_Alarm = '''
+<LIC-Msg>
+   <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+   <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+   <protVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </protVersion>
+   <payload>
+      <extPDU>
+<LI-ADM-Event>
+   <lI-ADM-MessageSequence>
+      <alarmNotification>
+         <alarmDescription><x2communicationFault/></alarmDescription>
+      </alarmNotification>
+   </lI-ADM-MessageSequence>
+</LI-ADM-Event></extPDU>
+   </payload>
+</LIC-Msg>
+'''
 if __name__ == "__main__":
     print start()
     print intCfgX2()

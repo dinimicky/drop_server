@@ -53,22 +53,25 @@ class X1ClientTest(unittest.TestCase):
         self.tr.clear()
         self.proto.dataReceived(li_xml_temp.Start_Resp)
         self.proto.cmd_queue.get().addCallback(self.getCmdData)
-        log.msg(self.proto.__dict__)
-        log.msg(self.proto.cmd_queue.__dict__)
-        log.msg(self.proto.x1_queue.__dict__)
         self.assertIsInstance(self.cmd_data[1], RespMsg)
+        self.assertEqual("OK", self.cmd_data[1].result)
         
     def test_start_timeout(self):
         self.proto.makeConnection(self.tr)
         self.proto.cmd_queue.get().addCallback(self.getCmdData)
         reqCmd = ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, li_xml_temp.start())
         self.proto.x1_queue.put(reqCmd)
-        self.tr.clear()        
+        self.tr.clear()
+        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        Reason = []        
         def connectionLost(Why):
-            return
+            Reason.append(Why)
         self.proto.connectionLost = connectionLost
         self.clock.advance(self.proto.timeOut)
-        self.assertEqual(0, len(self.proto._xpathObservers[0]))
+        self.assertEqual(1, len(Reason))
+        self.assertEqual("Unavailable", self.cmd_data[1].result)
+        self.assertEqual(1, len(self.proto._xpathObservers[0]))
+        
 #     def test_one_ping(self):
 #         self.proto.makeConnection(self.tr)
 #         self.proto.cmd_queue.get().addCallback(self.getCmdData)

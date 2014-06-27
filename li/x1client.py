@@ -17,6 +17,7 @@ from lixml import li_xml_temp
 class X1ClientProtocol(MultiXmlStream):
     X1PingRespPath = XPathQuery('/payload/ping/pingType/pingResponse')
     getX1PingRespSeqNbr = XPathQuery('/payload/ping/seqNbr').queryForString
+    X1AlarmPath = XPathQuery('/payload/extPDU/LI-ADM-Event/lI-ADM-MessageSequence/alarmNotification')
     callLater = reactor.callLater
     timeOut = 2
 
@@ -31,6 +32,9 @@ class X1ClientProtocol(MultiXmlStream):
             self.lcping = task.LoopingCall(self._sendPingRequest)
             self.lcping.start(config.ping_delay)
         MultiXmlStream.connectionMade(self)
+        def recordX1Alarm(element):
+            log.msg("recv X1 alarm: %s" % element.toXml())
+        self.addObserver(X1ClientProtocol.X1AlarmPath, recordX1Alarm)
           
     def cmdReceived(self, reqMsg):
         if reqMsg.type == 'cmd':
@@ -86,6 +90,7 @@ class X1ClientProtocol(MultiXmlStream):
         def cancelCmdResp():
             self.removeObserver(expectResp, recvCmdResp)
             log.msg("X1 did't receive response. request:%s." % self.reqMsg.content)
+            self.cmd_queue.put(RespMsg(result="Unavailable", content=None))
             self.reqMsg = None
             self.transport.loseConnection()
             
