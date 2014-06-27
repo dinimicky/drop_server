@@ -36,33 +36,33 @@ class X1ClientTest(unittest.TestCase):
             
     def test_connection(self):
         self.proto.makeConnection(self.tr)
-        self.assertEqual(1, len(self.proto.cmd_queue.pending))
-        self.assertEqual(1, len(self.proto.x1_queue.waiting))
+        self.assertEqual(1, len(self.proto.factory.cmd_queue.pending))
+        self.assertEqual(1, len(self.proto.factory.x1_queue.waiting))
         self.cmd_data = []
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         self.assertIsInstance(self.cmd_data[0], TcpMsg)
             
         
         
     def test_start(self):
         self.proto.makeConnection(self.tr)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         reqCmd = ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, li_xml_temp.start())
-        self.proto.x1_queue.put(reqCmd)
+        self.proto.factory.x1_queue.put(reqCmd)
         self.assertIn(X1ProtocolNegotiation.protocolProposal, self.tr.value())
         self.tr.clear()
         self.proto.dataReceived(li_xml_temp.Start_Resp)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         self.assertIsInstance(self.cmd_data[1], RespMsg)
         self.assertEqual("OK", self.cmd_data[1].result)
         
     def test_start_timeout(self):
         self.proto.makeConnection(self.tr)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         reqCmd = ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, li_xml_temp.start())
-        self.proto.x1_queue.put(reqCmd)
+        self.proto.factory.x1_queue.put(reqCmd)
         self.tr.clear()
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         Reason = []        
         def connectionLost(Why):
             Reason.append(Why)
@@ -74,7 +74,7 @@ class X1ClientTest(unittest.TestCase):
         
     def test_one_ping(self):
         self.proto.makeConnection(self.tr)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         self.proto._sendPingRequest()
         self.assertIn("pingRequest", self.tr.value())
         self.tr.clear()
@@ -84,7 +84,7 @@ class X1ClientTest(unittest.TestCase):
         
     def test_ping_timeout(self):     
         self.proto.makeConnection(self.tr)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         self.proto._sendPingRequest()
         self.assertIn("pingRequest", self.tr.value())
         self.tr.clear()
@@ -97,39 +97,9 @@ class X1ClientTest(unittest.TestCase):
         
     def test_alarm(self):  
         self.proto.makeConnection(self.tr)
-        self.proto.cmd_queue.get().addCallback(self.getCmdData)
+        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         self.proto.dataReceived(li_xml_temp.X1_Alarm)
         self.assertEqual(1, self.proto.alarmCounter)
-#
-#     def test_a_ping(self):
-#         self.test_connection()
-#         self.proto.sendPingRequest()
-#         self.assertIn("pingRequest", self.tr.value())
-#         self.tr.clear()
-#         (d, _pingCallID) = self.proto.pingResult[0]
-#         self.proto.dataReceived(li_xml_temp.X1_Ping_Resp)
-#         return self.assertIn('pingResponse', d.result)
-#         
-#     def test_start_timeout(self):
-#         self.proto.timeOut = 1
-#         self.test_connection()
-#         Start = ReqMsg(expectedRes = X1ProtocolNegotiation.protocolSelectionResult, content = li_xml_temp.start())
-#         self.proto.factory.x1_queue.put(Start)
-#         (d, _callID) = self.proto.result[0]
-#         self.assertIn(X1ProtocolNegotiation.protocolProposal, self.tr.value())
-#         self.tr.clear()
-#         self.clock.advance(self.proto.timeOut)
-#         return self.assertFailure(d, X1ClientTimeoutError)
-#         
-#     def test_ping_timeout(self):
-#         config.ping_delay=1
-#         config.ping_timeout=2
-#         config.pingEnable = True
-#         self.test_connection()
-#         self.assertIn("pingRequest", self.tr.value())
-#         (d, _pingCallID) = self.proto.pingResult[0]
-#         self.tr.clear()
-#         self.clock.advance(config.ping_timeout+1)
-#         return self.assertFailure(d, X1PingTimeoutError)
+
 
 

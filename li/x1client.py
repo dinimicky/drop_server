@@ -24,11 +24,8 @@ class X1ClientProtocol(MultiXmlStream):
     def connectionMade(self):
         log.msg('x1 tcp connection is made')
         self.alarmCounter = 0
-        self.x1_queue = self.factory.x1_queue
-        self.state = self.factory.state
-        self.cmd_queue = self.factory.cmd_queue
-        self.cmd_queue.put(TcpMsg(TcpConn.connected))
-        self.x1_queue.get().addCallback(self.cmdReceived)
+        self.factory.cmd_queue.put(TcpMsg(TcpConn.connected))
+        self.factory.x1_queue.get().addCallback(self.cmdReceived)
         if config.pingEnable:
             self.lcping = task.LoopingCall(self._sendPingRequest)
             self.lcping.start(config.ping_delay)
@@ -45,7 +42,7 @@ class X1ClientProtocol(MultiXmlStream):
             self.reqMsg = reqMsg
             self._sendX1Xml(self.reqMsg.content)
 
-        self.x1_queue.get().addCallback(self.cmdReceived)
+        self.factory.x1_queue.get().addCallback(self.cmdReceived)
 
     def connectionLost(self, Why):
         log.msg("connnect is lost, reason:%s" % Why)
@@ -55,14 +52,14 @@ class X1ClientProtocol(MultiXmlStream):
             lcping.stop()
         log.msg('server existed')
         reactor.stop()
-        if self.x1_queue:
-            self.x1_queue = None
+        if self.factory.x1_queue:
+            self.factory.x1_queue = None
         return Why
 
     def _sendPingRequest(self):
-        self.state.x1Seq += 1                         
-        self.send(li_xml_temp.pingX1Req(self.state.x1Seq))
-        log.msg("x1 ping request is sent out, x1Seq =", self.state.x1Seq)
+        self.factory.state.x1Seq += 1                         
+        self.send(li_xml_temp.pingX1Req(self.factory.state.x1Seq))
+        log.msg("x1 ping request is sent out, x1Seq =", self.factory.state.x1Seq)
 
         def recvPingResp(cancelPingId, x1Seq, element):
             cancelPingId.cancel()
@@ -75,7 +72,7 @@ class X1ClientProtocol(MultiXmlStream):
             self.transport.loseConnection()
             
         pingCallID = self.callLater(config.ping_timeout, ping_cancel)
-        self.addOnetimeObserver(X1ClientProtocol.X1PingRespPath, recvPingResp, 0, pingCallID, self.state.x1Seq)
+        self.addOnetimeObserver(X1ClientProtocol.X1PingRespPath, recvPingResp, 0, pingCallID, self.factory.state.x1Seq)
 
         
     def _sendX1Xml(self, xml):
@@ -93,7 +90,7 @@ class X1ClientProtocol(MultiXmlStream):
         def cancelCmdResp():
             self.removeObserver(expectResp, recvCmdResp)
             log.msg("X1 did't receive response. request:%s." % self.reqMsg.content)
-            self.cmd_queue.put(RespMsg(result="Unavailable", content=None))
+            self.factory.cmd_queue.put(RespMsg(result="Unavailable", content=None))
             self.reqMsg = None
             self.transport.loseConnection()
             
