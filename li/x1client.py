@@ -2,6 +2,8 @@
 Created on 2013-2-25
 
 @author: ezonghu
+
+Note: without receiving response, the whole process will exit.
 '''
 from twisted.internet.protocol import ClientFactory
 from twisted.internet import task, reactor
@@ -14,6 +16,7 @@ from common.state import TcpConn, RespMsg, TcpMsg
 from common import config
 from lixml import li_xml_temp
 
+
 class X1ClientProtocol(MultiXmlStream):
     X1PingRespPath = XPathQuery('/payload/ping/pingType/pingResponse')
     getX1PingRespSeqNbr = XPathQuery('/payload/ping/seqNbr').queryForString
@@ -24,7 +27,6 @@ class X1ClientProtocol(MultiXmlStream):
     def connectionMade(self):
         log.msg('x1 tcp connection is made')
         self.alarmCounter = 0
-        self.factory.cmd_queue.put(TcpMsg(TcpConn.connected))
         self.factory.x1_queue.get().addCallback(self.cmdReceived)
         if config.pingEnable:
             self.lcping = task.LoopingCall(self._sendPingRequest)

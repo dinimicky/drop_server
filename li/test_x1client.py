@@ -36,29 +36,26 @@ class X1ClientTest(unittest.TestCase):
             
     def test_connection(self):
         self.proto.makeConnection(self.tr)
-        self.assertEqual(1, len(self.proto.factory.cmd_queue.pending))
+        self.assertEqual(0, len(self.proto.factory.cmd_queue.pending))
         self.assertEqual(1, len(self.proto.factory.x1_queue.waiting))
         self.cmd_data = []
-        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
-        self.assertIsInstance(self.cmd_data[0], TcpMsg)
+        self.assertEqual(0, self.proto.alarmCounter)
             
         
         
     def test_start(self):
         self.proto.makeConnection(self.tr)
-        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         reqCmd = ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, li_xml_temp.start())
         self.proto.factory.x1_queue.put(reqCmd)
         self.assertIn(X1ProtocolNegotiation.protocolProposal, self.tr.value())
         self.tr.clear()
         self.proto.dataReceived(li_xml_temp.Start_Resp)
         self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
-        self.assertIsInstance(self.cmd_data[1], RespMsg)
-        self.assertEqual("OK", self.cmd_data[1].result)
+        self.assertIsInstance(self.cmd_data[0], RespMsg)
+        self.assertEqual("OK", self.cmd_data[0].result)
         
     def test_start_timeout(self):
         self.proto.makeConnection(self.tr)
-        self.proto.factory.cmd_queue.get().addCallback(self.getCmdData)
         reqCmd = ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, li_xml_temp.start())
         self.proto.factory.x1_queue.put(reqCmd)
         self.tr.clear()
@@ -69,7 +66,7 @@ class X1ClientTest(unittest.TestCase):
         self.proto.connectionLost = connectionLost
         self.clock.advance(self.proto.timeOut)
         self.assertEqual(1, len(Reason))
-        self.assertEqual("Unavailable", self.cmd_data[1].result)
+        self.assertEqual("Unavailable", self.cmd_data[0].result)
         self.assertEqual(1, len(self.proto._xpathObservers[0]))
         
     def test_one_ping(self):
