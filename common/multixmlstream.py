@@ -1,11 +1,11 @@
 from twisted.words.xish import xmlstream               
 class MultiXmlStream(xmlstream.XmlStream):
     def onDocumentStart(self, rootElement):
-        self.reqRootElement = rootElement
+        self.recvRootElement = rootElement
         xmlstream.XmlStream.onDocumentStart(self, rootElement)
     
     def onElement(self, element):
-        self.reqRootElement.addChild(element)
+        self.recvRootElement.addChild(element)
         xmlstream.XmlStream.onElement(self, element)
     def onDocumentEnd(self):
         '''
@@ -15,5 +15,5 @@ class MultiXmlStream(xmlstream.XmlStream):
         '''
         self.dispatch(self, xmlstream.STREAM_END_EVENT)
         self._initializeStream()
-        self.reqRootElement = None
+        self.recvRootElement = None
        

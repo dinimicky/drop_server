@@ -85,7 +85,7 @@ class X1ClientProtocol(MultiXmlStream):
             cancelCmdCallID.cancel()
             def send_resp2cmd_queue(x1CliInst):
                 log.msg('recv X1 response')
-                x1CliInst.factory.cmd_queue.put(RespMsg(result="OK", content=x1CliInst.reqRootElement))
+                x1CliInst.factory.cmd_queue.put(RespMsg(result="OK", content=x1CliInst.recvRootElement))
             self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, send_resp2cmd_queue)
             
         

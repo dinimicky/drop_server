@@ -36,12 +36,12 @@ class X2ServerProtocol(MultiXmlStream):
         log.msg('recv X2 message: %s' % X2ServerProtocol.X2IRIEvent.queryForNodes(element)[0].name)
         if self.factory.x2LogHandler is not None:
             def recordIRIEvent(x2ProtInst):
-                x2ProtInst.factory.x2LogHandler.msg(x2ProtInst.reqRootElement.toXml())
+                x2ProtInst.factory.x2LogHandler.msg(x2ProtInst.recvRootElement.toXml())
             self.addOnetimeObserver(xmlstream.STREAM_END_EVENT, recordIRIEvent)
         
 
     def __init__(self):
-        self.reqRootElement = None
+        self.recvRootElement = None
         self.pingResp = None
         MultiXmlStream.__init__(self)
         self.addObserver(X2ServerProtocol.X2PingReqPath, self._genPingResp)
