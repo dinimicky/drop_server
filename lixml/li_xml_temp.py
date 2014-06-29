@@ -200,8 +200,8 @@ def remTgtUri(seqNbr = 1,
     return RemTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         seqNbr, uri)
     
-def audTgtUri(
-         SeqNbr=1, uri="sip:user_a@cscf.com"):
+def audTgtUri(SeqNbr=1, 
+              uri="sip:user_a@cscf.com"):
     AudTgtUri = '''
     <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -226,8 +226,7 @@ def audTgtUri(
     return AudTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         SeqNbr, uri)
 
-def audAllTgt(
-         SeqNbr=1):
+def audAllTgt(SeqNbr=1):
     AudAllTgt = '''
     <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -250,8 +249,7 @@ def audAllTgt(
     return AudAllTgt % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         SeqNbr)
 
-def pingX1Req(
-         SeqNbr=1):
+def pingX1Req(SeqNbr=1):
     Ping = '''
      <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -268,8 +266,7 @@ def pingX1Req(
     return Ping % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                    SeqNbr)
 
-def pingX2Resp(
-         SeqNbr=1):
+def pingX2Resp(SeqNbr=1):
     Ping = '''
     <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
