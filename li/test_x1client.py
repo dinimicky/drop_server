@@ -9,7 +9,7 @@ from twisted.test import proto_helpers
 from twisted.python import log
 from li.x1client import X1ClientFactory
 from twisted.internet.defer import DeferredQueue
-from common.state import State, TcpMsg, ReqMsg, RespMsg, X1ProtocolNegotiation
+from common.state import State, ReqMsg, RespMsg, X1ProtocolNegotiation
 from lixml import li_xml_temp
 from common import config
 import sys

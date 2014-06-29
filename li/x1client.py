@@ -12,7 +12,7 @@ from twisted.words.xish import xmlstream
 from twisted.words.xish.xpath import XPathQuery
 
 from common.multixmlstream import MultiXmlStream
-from common.state import TcpConn, RespMsg, TcpMsg
+from common.state import RespMsg
 from common import config
 from lixml import li_xml_temp
 
@@ -92,7 +92,8 @@ class X1ClientProtocol(MultiXmlStream):
         def cancelCmdResp():
             self.removeObserver(expectResp, recvCmdResp)
             log.msg("X1 did't receive response. request:%s." % self.reqMsg.content)
-            self.factory.cmd_queue.put(RespMsg(result="Unavailable", content=None))
+            from twisted.words.xish import domish
+            self.factory.cmd_queue.put(RespMsg(result="Unavailable", content=domish.Element((None, 'Unavailable'))))
             self.reqMsg = None
             self.transport.loseConnection()
             
