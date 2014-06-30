@@ -19,31 +19,31 @@ log.startLogging(sys.stdout)
 class newCmdProxyFactory(cmdproxy.CmdProxyFactory):
     def _start_x2_server(self):
         return
+    
+    def start_x1_client(self):
+        return
+    
 class CmdProxyTest(unittest.TestCase):
 
     def setUp(self):
         config.pingEnable = False
         self.cmd_tr = proto_helpers.StringTransportWithDisconnection()
         self.x1_tr = proto_helpers.StringTransportWithDisconnection()
-        self.cmdFac = newCmdProxyFactory()
-        self.cmdConnection()
-    def cmdConnection(self):
-        self.cmdProto = self.cmdFac.buildProtocol(('127.0.0.1', 0))
-        self.cmd_tr.protocol = self.cmdProto
+        cmdFac = newCmdProxyFactory()
         
+        self.cmdProto = cmdFac.buildProtocol(('127.0.0.1', 0))
         self.cmdProto.makeConnection(self.cmd_tr)
-        def start_x1_client():
-            x1fac = x1client.X1ClientFactory(self.cmdProto.factory.cmd_queue, 
-                                             self.cmdProto.factory.x1_queue, 
-                                             self.cmdProto.factory.state)
-            self.x1Proto = x1fac.buildProtocol(('127.0.0.1', 0))
-            self.cmd_tr.protocol = self.x1Proto
-            self.x1Proto.makeConnection(self.x1_tr)
-        self.cmdProto._start_x1_connection = start_x1_client
-            
-    def tearDown(self):
-        pass
         
+        def start_x1_client():
+            self.x1Proto = cmdFac.x1CliFac.buildProtocol(('127.0.0.1', 0))
+            self.x1Proto.makeConnection(self.x1_tr)
+        
+        cmdFac.start_x1_client = start_x1_client
+        class dummyX1TCP(object):
+            def disconnect(self):
+                return
+        cmdFac.x1tcp = dummyX1TCP()
+                   
     def test_start(self):
         self.cmdProto.dataReceived(Requests['start'])
         self.assertIn('protocolProposal', self.x1_tr.value())
@@ -52,22 +52,76 @@ class CmdProxyTest(unittest.TestCase):
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
         
-    def test_intCfgX2_success(self):
+    def test_intCfgX2(self):
         self.test_start()
-        self.cmdConnection()
         self.cmdProto.dataReceived(Requests['intCfgX2'])
-        self.assertIn('interfConfRequest', self.x1_tr.value())
+        self.assertIn('x2InterfaceAddress', self.x1_tr.value())
         self.x1_tr.clear()
         self.x1Proto.dataReceived(li_xml_temp.IntCfgX2_Resp)
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
-
-    def test_intCfgX2X3_success(self):
+  
+    def test_intCfgX2X3(self):
         self.test_start()
-        self.cmdConnection()
         self.cmdProto.dataReceived(Requests['intCfgX2X3'])
-        self.assertIn('interfConfRequest', self.x1_tr.value())
+        self.assertIn('x3InterfaceAddress', self.x1_tr.value())
         self.x1_tr.clear()
         self.x1Proto.dataReceived(li_xml_temp.IntCfgX2X3_Resp)
         self.assertIn("success", self.cmd_tr.value())
         self.cmd_tr.clear()
+ 
+    def test_addTgtUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['addTgt'])
+        self.assertIn('addTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AddTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_remTgtUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['remTgt'])
+        self.assertIn('removeTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.RemTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_audTgtUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['audReq'])
+        self.assertIn('auditRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AudTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+        
+    def test_audAllTgt(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['audAll'])
+        self.assertIn('allTargets', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AudTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+        
+    def test_udpTgtUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['updTgt'])
+        self.assertIn('updateTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.UpdTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()        
+        
+    def test_stop(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['stop'])
+        self.assertIn('endSessionRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.Stop_Resp)
+        self.assertIn("endSessionAck", self.cmd_tr.value())
+        self.cmd_tr.clear()        
+                
+        

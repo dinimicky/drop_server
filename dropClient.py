@@ -10,13 +10,13 @@ from twisted.internet import defer
 from twisted.internet.protocol import ClientFactory
 
 Requests = {'start': '<cmd> <action>start</action></cmd> ',
-            'intCfgX2':' <cmd><action>intCfgX2</action> </cmd>',
+            'intCfgX2':' <cmd><action>intCfgX2</action><x2IP>127.0.0.1</x2IP><x2Port>22345</x2Port> </cmd>',
             'intCfgX2X3':' <cmd><action>intCfgX2X3</action> </cmd>',
-            'addTgt':' <cmd><action>addTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
-            'audAll':' <cmd><action>audAll</action></cmd> ',
-            'audReq':' <cmd><action>audReq</action> <uri>sip:123@163.com</uri></cmd> ',
-            'updTgt':' <cmd><action>updTgt</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
-            'remTgt':' <cmd><action>remTgt</action> <uri>sip:123@163.com</uri></cmd>',
+            'addTgt':' <cmd><action>addTgtUri</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
+            'audAll':' <cmd><action>audAllTgt</action></cmd> ',
+            'audReq':' <cmd><action>audTgtUri</action> <uri>sip:123@163.com</uri></cmd> ',
+            'updTgt':' <cmd><action>updTgtUri</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
+            'remTgt':' <cmd><action>remTgtUri</action> <uri>sip:123@163.com</uri></cmd>',
             'stop':' <cmd><action>stop</action> </cmd>',
             }
 class DropClientTimeoutError(Exception()):
@@ -76,15 +76,8 @@ def LiClient(host, port, requests):
 
 import optparse
 
-CmdFormat = {'start' : [],
-             'stop' : [],
-             'intCfgX2' : [],
-             'intCfgX2X3' : [],
-             'audReq' : ['uri'],
-             'audAll' : [],
-             'addTgt' : ['uri', 'ccReq', 'lirid'],
-             'remTgt' : ['uri'],
-             'updTgt' : ['uri', 'ccReq', 'lirid']}
+from common import config
+CmdFormat = config.ActionDict
 def parse_args():
     usage = """usage: %prog [options] [hostname]:port
 this is the hello client generator.

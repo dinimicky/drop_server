@@ -16,7 +16,8 @@ class CmdProxyServerProtocol(MultiXmlStream):
     
     def connectionMade(self):
         for k, v in CmdProxyServerProtocol.ActionDict.iteritems():
-            m = __import__("cmdcallbacks")
+            from importlib import import_module
+            m = import_module("cmdcallbacks")
             cmdObserver = getattr(m, k)(k, *v)
             log.msg('add Observer: %s' % k)
             self.addObserver(cmdObserver.xPathQuery, cmdObserver.checkCmdAction, 0, self)
@@ -34,6 +35,11 @@ class CmdProxyFactory(ServerFactory):
         from twisted.internet import reactor
         self.x2tcp = reactor.listenTCP(config.x2InterfacePort, self.x2CliFac, 
                                        interface = config.ipAddress_LITT)
+        
+    def start_x1_client(self):
+        from twisted.internet import reactor
+        self.x1tcp = reactor.connectTCP(config.ipAddress_IAP, config.x1InterfacePort, self.x1CliFac)   
+             
     def __init__(self):
         self.state = State()
         

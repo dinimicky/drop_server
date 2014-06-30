@@ -34,14 +34,14 @@ What kind of command is specified?
 
 intChgX2:
 <cmd>
-    <action>intChg</action>
+    <action>intCfgX2</action>
     <x2IP>127.0.0.1</x2IP>
     <x2Port>11111<x2Port> 
 </cmd>
 
 intChgX2X3:
 <cmd>
-    <action>intChg</action>
+    <action>intCfgX2X3</action>
     <x2IP>127.0.0.1</x2IP>
     <x2Port>11111<x2Port>
     <x3IP>127.0.0.1</x3IP>
@@ -51,17 +51,17 @@ intChgX2X3:
 
 audReq:
 <cmd>
-    <action>audReq</action> 
+    <action>audTgtUri</action> 
     <uri>sip:123@163.com</uri>
 </cmd>
 
 audAll:
 <cmd>
-    <action>audAll</action> 
+    <action>audAllTgt</action> 
 </cmd>
 addTarget:
 <cmd>
-    <action>addTgt</action>
+    <action>addTgtUri</action>
     <uri>sip:123@163.com</uri>
     <ccReq>True</ccReq>
     <lirid>1234</lirid>
@@ -70,13 +70,13 @@ addTarget:
 
  removeTarget:
  <cmd>
-     <action>remTgt</action>
+     <action>remTgtUri</action>
      <uri>sip:123@163.com</uri>
  </cmd>
  
  updateTarget:
  <cmd>
-     <action>updTgt</action>
+     <action>updTgtUri</action>
      <uri>sip:123@163.com</uri>
      <ccReq>true</ccReq>
      <lirid>1234</lirid>
@@ -91,13 +91,13 @@ addTarget:
 '''
 ActionDict = {'start' : [],
               'stop' : [],
-              'intCfgX2' : [],
-              'intCfgX2X3' : [],
-              'audReq' : ['uri'],
-              'audAll' : [],
-              'addTgt' : ['uri', 'ccReq', 'lirid'],
-              'remTgt' : ['uri'],
-              'updTgt' : ['uri', 'ccReq', 'lirid']}
+              'intCfgX2' : ['x2IP', 'x2Port'],
+              'intCfgX2X3' : ['x2IP', 'x2Port', 'x3IP', 'x3Port'],
+              'audTgtUri' : ['uri'],
+              'audAllTgt' : [],
+              'addTgtUri' : ['uri', 'ccReq', 'lirid'],
+              'remTgtUri' : ['uri'],
+              'updTgtUri' : ['uri', 'ccReq', 'lirid']}
 import socket
 def convertip(StrIP):
     return ("%02X%02X%02X%02X" % tuple(map(lambda x:ord(x), socket.inet_aton(StrIP))))

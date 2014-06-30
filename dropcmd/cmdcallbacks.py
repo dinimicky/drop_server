@@ -88,7 +88,7 @@ class CmdReq(object):
             self.root.addElement(k, content = kwargs[k])
             
     def toXml(self):
-        self.root.toXml()
+        return self.root.toXml()
         
 class CmdResp(CmdReq):
     def __init__(self, result, comment):
@@ -105,24 +105,30 @@ class CmdCB(object):
         self.args = args
 
     def _getCmdRespXmlString(self, checkElement, respMsg):
-        if respMsg.result == 'OK' and XPathQuery(checkElement).matches(respMsg.content):
-            return CmdResp('success', respMsg.content).toXml()
+        log.msg('get respMsg: %s; checkElement: %s' % (respMsg.result, checkElement))
+        if respMsg.result == 'OK' and XPathQuery('//%s' %checkElement).matches(respMsg.content):
+            resp = CmdResp('success', respMsg.content).toXml()
+            return resp
         
-        return CmdResp('failure', respMsg.content).toXml() 
+        resp = CmdResp('failure', respMsg.content).toXml() 
+        return resp
    
     
     def checkCmdAction(self, protoInst, element): 
-        log.msg('recv cmd, action: %s' % self.xPathQuery.queryForString(element))
+        log.msg('recv cmd, action: %s, and add onetime oberser' % self.xPathQuery.queryForString(element))
         protoInst.addOnetimeObserver(xmlstream.STREAM_END_EVENT, self._sendXml2X1Client)
 
     def _getX1ReqXmlString(self, cmdRootElement, **kwargs):
         xmlPara = {}
+        log.msg('recv cmd xml: %s' % cmdRootElement.toXml())
         for arg in self.args:
-            xmlPara[arg] = XPathQuery("//%s" % arg).queryForString(cmdRootElement)
+            log.msg('query arg: %s' % arg)
+            xmlPara[arg] = XPathQuery("/cmd/%s" % arg).queryForString(cmdRootElement)
         
         for k, v in kwargs.iteritems():
             xmlPara[k] = v
-        m = __import__("li.li_xml_temp")
+        from importlib import import_module
+        m = import_module('lixml.li_xml_temp')
         fn = getattr(m, self.text)
         return fn(**xmlPara)            
     '''
@@ -132,7 +138,7 @@ class CmdCB(object):
         protoInst.send(self._getCmdRespXmlString('success', respMsg)) 
 
     def _sendXml2X1Client(self, protoInst):
-        pass
+        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
 #         protoInst.factory.state.x1Seq += 1
 #         protoInst.factory.x1_queue.put(self._getX1ReqXmlString(protoInst.recvRootElement, seqNbr = protoInst.factory.state.x1Seq))
 #         protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
@@ -141,11 +147,12 @@ class CmdCB(object):
         
 class start(CmdCB):
     def _sendXml2X1Client(self, protoInst):
-        from twisted.internet import reactor
-        protoInst.factory.x1tcp = reactor.connectTCP(config.ipAddress_IAP, config.x1InterfacePort, self.x1CliFac)
+        log.msg('make a X1 connection')
+        protoInst.factory.start_x1_client()
+        log.msg('send %s ReqMsg' % X1ProtocolNegotiation.protocolProposal)
         protoInst.factory.x1_queue.put(ReqMsg(X1ProtocolNegotiation.protocolSelectionResult, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(start, self)._sendXml2X1Client(protoInst)
         
     def _sendCmdRespXmlString(self, respMsg, protoInst):
         protoInst.send(self._getCmdRespXmlString(X1ProtocolNegotiation.protocolSelectionResult, respMsg)) 
@@ -154,56 +161,55 @@ class stop(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.endSessionAck, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(stop, self)._sendXml2X1Client(protoInst)
         
     def _sendCmdRespXmlString(self, respMsg, protoInst):
-        protoInst.factory.x1tcp.disconnect()
         protoInst.send(self._getCmdRespXmlString(X1AdmMsgs.endSessionAck, respMsg))
+        protoInst.factory.x1tcp.disconnect()
         
 class intCfgX2(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.interfConfResponse, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(intCfgX2, self)._sendXml2X1Client(protoInst)
         
     def _sendCmdRespXmlString(self, respMsg, protoInst):
-        protoInst.factory.x1tcp.disconnect()
         protoInst.send(self._getCmdRespXmlString('success', respMsg))
         
 class intCfgX2X3(intCfgX2):  
     pass
 
-class addTgtUri(intCfgX2):
+class addTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
-        protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.addTargetRequest, 
+        protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.addTargetResp, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement,
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(addTgtUri, self)._sendXml2X1Client(protoInst)
         
-class updTgtUri(intCfgX2):
+class updTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
         protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.updateTargetResp, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement,
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(updTgtUri, self)._sendXml2X1Client(protoInst)
 
-class remTgtUri(intCfgX2):
+class remTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
         protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.removeTargetResp, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement,
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(remTgtUri, self)._sendXml2X1Client(protoInst)
 
-class audTgtUri(intCfgX2):
+class audTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
         protoInst.factory.x1_queue.put(ReqMsg(X1AdmMsgs.auditResponse, 
                                               self._getX1ReqXmlString(protoInst.recvRootElement,
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
-        protoInst.factory.cmd_queue.get().addCallback(self._sendCmdRespXmlString, protoInst)
+        super(audTgtUri, self)._sendXml2X1Client(protoInst)
 
 class audAllTgt(audTgtUri):
     pass

@@ -62,7 +62,7 @@ def stop():
     </LIC-Msg>
     '''
     return Stop % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor)
-def intCfgX2(X2IP="C0A80E1D", X2Port=22345):
+def intCfgX2(x2IP="C0A80E1D", x2Port=22345):
     IntCfg = '''
     <LIC-Msg>
     <lic-ModuleID>%s</lic-ModuleID>
@@ -76,7 +76,7 @@ def intCfgX2(X2IP="C0A80E1D", X2Port=22345):
     <maxNumberOf-LI-ADM-Messages>%d</maxNumberOf-LI-ADM-Messages>
     <maxNumberOf-LI-IRI-Messages>%d</maxNumberOf-LI-IRI-Messages>
     <x2InterfaceAddress><ipV4>%s</ipV4></x2InterfaceAddress>
-    <x2InterfacePort>%d</x2InterfacePort>
+    <x2InterfacePort>%s</x2InterfacePort>
     </interfConfRequest>
     </lI-ADM-MessageSequence>
     </LI-ADM-Event>
@@ -86,10 +86,10 @@ def intCfgX2(X2IP="C0A80E1D", X2Port=22345):
     '''
     return IntCfg % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                      config.MaxSupportedNumberOf_X1_Messages, config.MaxSupportedNumberOf_X2_Messages,
-                     X2IP, X2Port)
+                     x2IP, x2Port)
 
-def intCfgX2X3(X2IP="C0A80E1D", X2Port=22345, 
-          X3IP="C0A80E1D", X3Port=32345
+def intCfgX2X3(x2IP="C0A80E1D", x2Port=22345, 
+          x3IP="C0A80E1D", x3Port=32345
           ):
     IntCfg = '''
     <LIC-Msg>
@@ -104,9 +104,9 @@ def intCfgX2X3(X2IP="C0A80E1D", X2Port=22345,
     <maxNumberOf-LI-ADM-Messages>%d</maxNumberOf-LI-ADM-Messages>
     <maxNumberOf-LI-IRI-Messages>%d</maxNumberOf-LI-IRI-Messages>
     <x2InterfaceAddress><ipV4>%s</ipV4></x2InterfaceAddress>
-    <x2InterfacePort>%d</x2InterfacePort>
+    <x2InterfacePort>%s</x2InterfacePort>
     <x3InterfaceAddress><ipV4>%s</ipV4></x3InterfaceAddress>
-    <x3InterfacePort>%d</x3InterfacePort>
+    <x3InterfacePort>%s</x3InterfacePort>
     </interfConfRequest>
     </lI-ADM-MessageSequence>
     </LI-ADM-Event>
@@ -116,10 +116,10 @@ def intCfgX2X3(X2IP="C0A80E1D", X2Port=22345,
     '''
     return IntCfg % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                      config.MaxSupportedNumberOf_X1_Messages, config.MaxSupportedNumberOf_X2_Messages,
-                     X2IP, X2Port, X3IP,X3Port)
+                     x2IP, x2Port, x3IP, x3Port)
 
 def addTgtUri(seqNbr = 1,
-          uri="sip:user_a@cscf.com", lirid = 1, cCRequired = True
+          uri="sip:user_a@cscf.com", lirid = 1, ccReq = 'true'
           ):
     AddTgtUri = '''
     <LIC-Msg>
@@ -135,7 +135,7 @@ def addTgtUri(seqNbr = 1,
           <targetInfo>
             <targetId><uri>%s</uri></targetId>
             %s
-            <lIRID>%d</lIRID>
+            <lIRID>%s</lIRID>
           </targetInfo>
         </addTargetRequest>
       </lI-ADM-MessageSequence>
@@ -145,11 +145,11 @@ def addTgtUri(seqNbr = 1,
     </LIC-Msg>    
     '''
     return AddTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, uri, '<cCRequired/>' if cCRequired else "", lirid )
+                        seqNbr, uri, '<cCRequired/>' if ccReq == 'true' else "", lirid )
 
         
 def updTgtUri(seqNbr = 1,
-          uri="sip:user_a@cscf.com", lirid = 1, cCRequired = True
+          uri="sip:user_a@cscf.com", lirid = 1, ccReq = 'true'
           ):
     UpdTgtUri = '''
     <LIC-Msg>
@@ -165,7 +165,7 @@ def updTgtUri(seqNbr = 1,
           <targetInfo>
             <targetId><uri>%s</uri></targetId>
             %s
-            <lIRID>%d</lIRID>
+            <lIRID>%s</lIRID>
           </targetInfo>
         </addTargetRequest>
       </lI-ADM-MessageSequence>
@@ -175,7 +175,7 @@ def updTgtUri(seqNbr = 1,
     </LIC-Msg>    
     '''
     return UpdTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, uri, '<cCRequired/>' if cCRequired else "",lirid)
+                        seqNbr, uri, '<cCRequired/>' if ccReq == 'true' else "",lirid)
 def remTgtUri(seqNbr = 1,
           uri="sip:user_a@cscf.com"):
     RemTgtUri = '''
@@ -200,7 +200,7 @@ def remTgtUri(seqNbr = 1,
     return RemTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         seqNbr, uri)
     
-def audTgtUri(SeqNbr=1, 
+def audTgtUri(seqNbr=1, 
               uri="sip:user_a@cscf.com"):
     AudTgtUri = '''
     <LIC-Msg>
@@ -224,9 +224,9 @@ def audTgtUri(SeqNbr=1,
     </LIC-Msg>
     '''
     return AudTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        SeqNbr, uri)
+                        seqNbr, uri)
 
-def audAllTgt(SeqNbr=1):
+def audAllTgt(seqNbr=1):
     AudAllTgt = '''
     <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -247,9 +247,9 @@ def audAllTgt(SeqNbr=1):
     </LIC-Msg>
     '''
     return AudAllTgt % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        SeqNbr)
+                        seqNbr)
 
-def pingX1Req(SeqNbr=1):
+def pingX1Req(seqNbr=1):
     Ping = '''
      <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -264,9 +264,9 @@ def pingX1Req(SeqNbr=1):
     </LIC-Msg>   
     '''
     return Ping % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                   SeqNbr)
+                   seqNbr)
 
-def pingX2Resp(SeqNbr=1):
+def pingX2Resp(seqNbr=1):
     Ping = '''
     <LIC-Msg>
       <lic-ModuleID>%s</lic-ModuleID>
@@ -281,7 +281,7 @@ def pingX2Resp(SeqNbr=1):
     </LIC-Msg>
     '''
     return Ping % (config.Lic_ObjectId, config.LI_IRI_ObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor,  
-                   SeqNbr)
+                   seqNbr)
 
 Start_Resp = '''
 <LIC-Msg>
@@ -410,6 +410,108 @@ X1_Alarm = '''
    </lI-ADM-MessageSequence>
 </LI-ADM-Event></extPDU>
    </payload>
+</LIC-Msg>
+'''
+
+AddTgtUri_Resp_OK = '''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <addTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </addTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+'''
+
+RemTgtUri_Resp_OK = '''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <removeTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </removeTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+'''
+
+AudTgtUri_Resp_OK = '''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <auditResponse>
+      <seqNbr>23</seqNbr>
+      <targetInfo>
+        <targetId><uri>sip:junhua@ericsson.com</uri></targetId>
+        <cCRequired/>
+        <lIRID>1111</lIRID>
+      </targetInfo>
+      <result><success/></result>
+      <totNbrTargetsInAuditResp>1</totNbrTargetsInAuditResp>
+    </auditResponse>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+'''
+UpdTgtUri_Resp_OK = '''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <updateTargetResp>
+      <seqNbr>23</seqNbr>
+      <result><success/></result>
+    </updateTargetResp>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
+</LIC-Msg>
+'''
+
+Stop_Resp = '''
+<LIC-Msg>
+  <lic-ModuleID>0.4.0.127.0.5.3.4.1</lic-ModuleID>
+  <prot-ModuleID>0.4.0.127.0.5.3.1.1</prot-ModuleID>
+  <protVersion><major>1</major><minor>0</minor></protVersion>
+  <payload>
+    <extPDU>
+      <LI-ADM-Event>
+  <lI-ADM-MessageSequence>
+    <endSessionAck/>
+  </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+  </payload>
 </LIC-Msg>
 '''
 if __name__ == "__main__":
