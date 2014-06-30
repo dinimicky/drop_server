@@ -7,7 +7,6 @@ from twisted.words.xish import domish
 from twisted.words.xish.xpath import XPathQuery
 from twisted.words.xish import xmlstream
 from twisted.python import log
-from common import config
 from common.state import X1ProtocolNegotiation, X1AdmMsgs, ReqMsg
 '''
  ========================================
