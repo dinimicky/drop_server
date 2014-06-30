@@ -8,7 +8,6 @@ from common import config
 from dropClient import Requests
 from twisted.trial import unittest
 from dropcmd import cmdproxy
-from li import x1client
 from lixml import li_xml_temp
 from twisted.python import log
 from twisted.test import proto_helpers
