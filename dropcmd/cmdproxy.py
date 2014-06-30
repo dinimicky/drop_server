@@ -4,8 +4,6 @@ Created on 2013-2-25
 @author: ezonghu
 '''
 from common.multixmlstream import MultiXmlStream
-
-
 from common import config
 from common.state import State
 from twisted.python import log
