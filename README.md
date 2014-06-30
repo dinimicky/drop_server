@@ -13,64 +13,82 @@
 ## What kind of command is specified?
 ### Request:
 > Start:
-> `  <cmd>
+> ```xml
+>    <cmd>
 >       <action>start</action>
->   </cmd>`
+>    </cmd>```
 
 
- Stop:
- <cmd>
-     <action>stop</action>
- </cmd>
+>  Stop:
+> ```xml
+>  <cmd>
+>      <action>stop</action>
+>  </cmd>
+> ```
 
-intChgX2:
-<cmd>
-    <action>intChgX2</action>
-</cmd>
+> intCfgX2:
+> ```xml
+> <cmd>
+>     <action>intChgX2</action>
+> </cmd>
+> ```
 
-intChgX2X3:
-<cmd>
-    <action>intChgX2X3</action>  
-</cmd>
-
-
-audReq:
-<cmd>
-    <action>audReq</action> 
-    <uri>sip:123@163.com</uri>
-</cmd>
-
-audAll:
-<cmd>
-    <action>audAll</action> 
-</cmd>
-
-addTarget:
-<cmd>
-    <action>addTgt</action>
-    <uri>sip:123@163.com</uri>
-    <ccReq>True</ccReq>
-    <lirid>1234</lirid>
-</cmd>
+> intCfgX2X3:
+> ```xml
+> <cmd>
+>     <action>intChgX2X3</action>
+> </cmd>
+> ```
 
 
- removeTarget:
- <cmd>
-     <action>remTgt</action>
-     <uri>sip:123@163.com</uri>
- </cmd>
- 
- updateTarget:
- <cmd>
-     <action>updTgt</action>
-     <uri>sip:123@163.com</uri>
-     <ccReq>true</ccReq>
-     <lirid>1234</lirid>
- </cmd>
- 
- ========================================
- Response:
- ========================================
+> audReq:
+> ```xml
+> <cmd>
+>     <action>audReq</action>
+>     <uri>sip:123@163.com</uri>
+> </cmd>
+> ```
+
+> audAll:
+> ```xml
+> <cmd>
+>     <action>audAll</action>
+> </cmd>
+> ```
+
+> addTarget:
+> ```xml
+> <cmd>
+>     <action>addTgt</action>
+>     <uri>sip:123@163.com</uri>
+>     <ccReq>True</ccReq>
+>     <lirid>1234</lirid>
+> </cmd>
+> ```
+
+>  removeTarget:
+> ```xml
+>  <cmd>
+>      <action>remTgt</action>
+>      <uri>sip:123@163.com</uri>
+>  </cmd>
+> ```
+
+>  updateTarget:
+> ```xml
+>  <cmd>
+>      <action>updTgt</action>
+>      <uri>sip:123@163.com</uri>
+>      <ccReq>true</ccReq>
+>      <lirid>1234</lirid>
+>  </cmd>
+> ```
+
+###  Response:
+
+```xml
  <cmd>
      <result>success/failure</result>
+     <comment/>
  </cmd>   
+```
