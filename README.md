@@ -30,7 +30,7 @@
 > intCfgX2:
 > ```xml
 > <cmd>
->     <action>intChgX2</action>
+>     <action>intCfgX2</action>
 >     <x2IP>192.168.1.1</x2IP>
 >     <x2Port>22345</x2Port>
 > </cmd>
@@ -39,7 +39,7 @@
 > intCfgX2X3:
 > ```xml
 > <cmd>
->     <action>intChgX2X3</action>
+>     <action>intCfgX2X3</action>
 >     <x2IP>192.168.1.1</x2IP>
 >     <x2Port>22345</x2Port>
 >     <x3IP>192.168.1.1</x3IP>
@@ -51,7 +51,7 @@
 > audReq:
 > ```xml
 > <cmd>
->     <action>audReq</action>
+>     <action>audTgtUri</action>
 >     <uri>sip:123@163.com</uri>
 > </cmd>
 > ```
@@ -59,14 +59,14 @@
 > audAll:
 > ```xml
 > <cmd>
->     <action>audAll</action>
+>     <action>audAllTgt</action>
 > </cmd>
 > ```
 
 > addTarget:
 > ```xml
 > <cmd>
->     <action>addTgt</action>
+>     <action>addTgtUri</action>
 >     <uri>sip:123@163.com</uri>
 >     <ccReq>True</ccReq>
 >     <lirid>1234</lirid>
@@ -76,7 +76,7 @@
 >  removeTarget:
 > ```xml
 >  <cmd>
->      <action>remTgt</action>
+>      <action>remTgtUri</action>
 >      <uri>sip:123@163.com</uri>
 >  </cmd>
 > ```
@@ -84,7 +84,7 @@
 >  updateTarget:
 > ```xml
 >  <cmd>
->      <action>updTgt</action>
+>      <action>updTgtUri</action>
 >      <uri>sip:123@163.com</uri>
 >      <ccReq>true</ccReq>
 >      <lirid>1234</lirid>
