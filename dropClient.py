@@ -33,7 +33,6 @@ class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
     
     def onDocumentEnd(self):
         log.msg("recv cmd resp: %s" % self.recvRootElement.toXml())
-        MultiXmlStream.onDocumentEnd(self)
         self.transport.loseConnection()
 
 class LiClientFactory(ClientFactory):
@@ -80,7 +79,7 @@ it means it  will generate 2 clients and each clients will send 10 hello message
             host= "127.0.0.1"
             port=addr
         else:
-            host, port = addr.split( ":", 1 )
+            host, port = addr.rsplit( ":", 1 )
        
         if not port.isdigit():
             parser.error( "Ports must be integers." )

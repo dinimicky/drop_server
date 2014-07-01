@@ -8,19 +8,23 @@ from twisted.trial import unittest
 from twisted.internet import task
 from twisted.test import proto_helpers
 from dropClient import LiClientFactory
+import sys
+from twisted.python import log
+log.startLogging(sys.stdout)
 class DropClientTest(unittest.TestCase):
 
 
     def setUp(self):
         self.tr = proto_helpers.StringTransportWithDisconnection()
         self.clock = task.Clock()
-        factory = LiClientFactory()
+
+     
+    def _sendCmd(self, cmd):
+        factory = LiClientFactory(cmd)
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
         self.tr.protocol = self.proto
         self.proto.callLater = self.clock.callLater
-     
-    def _sendCmd(self, cmd):
-        self.proto.factory.requests = [cmd]
+        self.proto.factory.cmd = cmd
         self.proto.makeConnection(self.tr)
         def lost():
             return
@@ -36,14 +40,13 @@ class DropClientTest(unittest.TestCase):
         self.assertIn('start', self.tr.value())
         
     def test_result_success(self):
-        self.test_start()
+        self._sendCmd(dropClient.Requests['start'])
         self._sendResp("success", "test start")
-        
-        self.assertIn("success", str(self.proto.resp))
-        
+        self.assertIn("success", str(self.proto.recvRootElement.toXml()))
+         
     def test_result_failure(self):
         self.test_start()
-
         self._sendResp("failure", "test start")
+        self.assertIn("failure", str(self.proto.recvRootElement.toXml()))
+
         
-        self.assertIn("failure", str(self.proto.resp))
