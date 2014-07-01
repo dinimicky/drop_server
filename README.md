@@ -31,6 +31,8 @@
 > ```xml
 > <cmd>
 >     <action>intChgX2</action>
+>     <x2IP>192.168.1.1</x2IP>
+>     <x2Port>22345</x2Port>
 > </cmd>
 > ```
 
@@ -38,6 +40,10 @@
 > ```xml
 > <cmd>
 >     <action>intChgX2X3</action>
+>     <x2IP>192.168.1.1</x2IP>
+>     <x2Port>22345</x2Port>
+>     <x3IP>192.168.1.1</x3IP>
+>     <x3Port>32345</x3Port>
 > </cmd>
 > ```
 
