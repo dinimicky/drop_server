@@ -64,6 +64,11 @@ it means it  will generate 2 clients and each clients will send 10 hello message
     parser.add_option("-u", "--uri", dest="uri" , help="please input sip uri", default='')
     parser.add_option("-c", "--ccReq", dest="ccReq" , action='store_true' , help="if it set, ccReq is enabled", default=False)
     parser.add_option('-l', '--lirid', dest='lirid', type='int', help='please input lirid number')
+    parser.add_option('-x', '--x2IP', dest='x2IP', help='please input X2 IP Address')
+    parser.add_option('-p', '--x2Port', dest='x2Port', type='int', help='please input X2 Port')
+    parser.add_option('-X', '--x3IP', dest='x3IP', help='please input X3 IP Address')
+    parser.add_option('-P', '--x3Port', dest='x3Port', type='int', help='please input X3 Port')
+    
     options, addresses = parser.parse_args()
    
     if not addresses:
@@ -95,6 +100,9 @@ def generateCmd(options):
     args = config.ActionDict[action]
     kwargs = {}
     for arg in args:
+        if 'IP' in arg:
+            kwargs[arg] = config.convertip(getattr(options, arg))
+            continue
         kwargs[arg] = getattr(options, arg)
         
     return CmdReq(action, args, **kwargs).toXml()
