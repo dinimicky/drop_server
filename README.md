@@ -16,7 +16,8 @@
 > ```xml
 >    <cmd>
 >       <action>start</action>
->    </cmd>```
+>    </cmd>
+>```
 
 
 >  Stop:
