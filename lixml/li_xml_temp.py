@@ -226,6 +226,218 @@ def audTgtUri(seqNbr=1,
     return AudTgtUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         seqNbr, uri)
 
+
+def addTgtWildcardUri(seqNbr = 1,
+          wuri="sip:user*@cscf.com", lirid = 1, cCRequired = True
+          ):
+    AddTgtWildcardUri = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <addTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetInfo>
+            <targetId><wild-card-uri>%s</wild-card-uri></targetId>
+            %s
+            <lIRID>%s</lIRID>
+          </targetInfo>
+        </addTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>    
+    '''
+    return AddTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, wuri, '<cCRequired/>' if cCRequired else "", lirid )
+
+        
+def updTgtWildcardUri(seqNbr = 1,
+          wuri="sip:user*@cscf.com", lirid = 1, cCRequired = True
+          ):
+    UpdTgtWildcardUri = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <updateTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetInfo>
+            <targetId><wild-card-uri>%s</wild-card-uri></targetId>
+            %s
+            <lIRID>%s</lIRID>
+          </targetInfo>
+        </updateTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>    
+    '''
+    return UpdTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, wuri, '<cCRequired/>' if cCRequired else "",lirid)
+def remTgtWildcardUri(seqNbr = 1,
+          wuri="sip:user*@cscf.com"):
+    RemTgtWildcardUri = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <removeTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetId><wild-card-uri>%s</wild-card-uri></targetId>
+        </removeTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>
+    '''
+    return RemTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, wuri)
+    
+def audTgtWildcardUri(
+         SeqNbr=1, wuri="sip:user*@cscf.com"):
+    AudTgtWildcardUri = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <auditRequest>
+          <seqNbr>%d</seqNbr>
+          <targetId><wild-card-uri>%s</wild-card-uri></targetId>
+        </auditRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>
+    '''
+    return AudTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        SeqNbr, wuri)
+def addTgtFNI(seqNbr = 1,
+          fni="pstn1", lirid = 1, cCRequired = True
+          ):
+    AddTgtFNI = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <addTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetInfo>
+            <targetId><foreignNetworkIdentifier>%s</foreignNetworkIdentifier></targetId>
+            %s
+            <lIRID>%s</lIRID>
+          </targetInfo>
+        </addTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>    
+    '''
+    return AddTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, fni, '<cCRequired/>' if cCRequired else "", lirid )
+
+        
+def updTgtFNI(seqNbr = 1,
+          fni="pstn1", lirid = 1, cCRequired = True
+          ):
+    UpdTgtFNI = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <updateTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetInfo>
+            <targetId><foreignNetworkIdentifier>%s</foreignNetworkIdentifier></targetId>
+            %s
+            <lIRID>%s</lIRID>
+          </targetInfo>
+        </updateTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>    
+    '''
+    return UpdTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, fni, '<cCRequired/>' if cCRequired else "",lirid)
+def remTgtFNI(seqNbr = 1,
+          fni="pstn1"):
+    RemTgtFNI = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <removeTargetRequest>
+          <seqNbr>%d</seqNbr>
+          <targetId><foreignNetworkIdentifier>%s</foreignNetworkIdentifier></targetId>
+        </removeTargetRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>
+    '''
+    return RemTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        seqNbr, fni)
+    
+def audTgtFNI(
+         SeqNbr=1, fni="pstn1"):
+    AudTgtFNI = '''
+    <LIC-Msg>
+      <lic-ModuleID>%s</lic-ModuleID>
+      <prot-ModuleID>%s</prot-ModuleID>
+      <protVersion><major>%d</major><minor>%d</minor></protVersion>
+      <payload>
+    <extPDU>
+      <LI-ADM-Event>
+      <lI-ADM-MessageSequence>
+        <auditRequest>
+          <seqNbr>%d</seqNbr>
+          <targetId><foreignNetworkIdentifier>%s</foreignNetworkIdentifier></targetId>
+        </auditRequest>
+      </lI-ADM-MessageSequence>
+      </LI-ADM-Event>
+    </extPDU>
+      </payload>
+    </LIC-Msg>
+    '''
+    return AudTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
+                        SeqNbr, fni)
+
 def audAllTgt(seqNbr=1):
     AudAllTgt = '''
     <LIC-Msg>
@@ -248,6 +460,7 @@ def audAllTgt(seqNbr=1):
     '''
     return AudAllTgt % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         seqNbr)
+
 
 def pingX1Req(seqNbr=1):
     Ping = '''
