@@ -97,7 +97,17 @@ ActionDict = {'start' : [],
               'audAllTgt' : [],
               'addTgtUri' : ['uri', 'ccReq', 'lirid'],
               'remTgtUri' : ['uri'],
-              'updTgtUri' : ['uri', 'ccReq', 'lirid']}
+              'updTgtUri' : ['uri', 'ccReq', 'lirid'],
+              'addTgtWildcardUri' : ['wuri', 'ccReq', 'lirid'],
+              'remTgtWildcardUri' : ['wuri'],
+              'updTgtWildcardUri' : ['wuri', 'ccReq', 'lirid'],
+              'audTgtWildcardUri' : ['wuri'],
+              'addTgtFNI' : ['fni', 'ccReq', 'lirid'],
+              'remTgtFNI' : ['fni'],
+              'updTgtFNI' : ['fni', 'ccReq', 'lirid'],
+              'audTgtFNI' : ['fni'],
+              
+              }
 import socket
 def convertip(StrIP):
     return ("%02X%02X%02X%02X" % tuple(map(lambda x:ord(x), socket.inet_aton(StrIP))))
