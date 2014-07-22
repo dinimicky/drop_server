@@ -47,26 +47,11 @@
 > </cmd>
 > ```
 
-
-> audReq:
-> ```xml
-> <cmd>
->     <action>audTgtUri</action>
->     <uri>sip:123@163.com</uri>
-> </cmd>
-> ```
-
-> audAll:
-> ```xml
-> <cmd>
->     <action>audAllTgt</action>
-> </cmd>
-> ```
-
 > the target has 3 kinds:
 >> 1. uri, the element is <uri>
 >> 2. wild-card-uri, the element is <wuri>
 >> 3. foreignNetworkIdentifier, the element is <fni>
+
 > addTarget:
 > ```xml
 > <cmd>
@@ -95,6 +80,20 @@
 >  </cmd>
 > ```
 
+> audReq:
+> ```xml
+> <cmd>
+>     <action>audTgtUri</action>
+>     <uri>sip:123@163.com</uri>
+> </cmd>
+> ```
+
+> audAll:
+> ```xml
+> <cmd>
+>     <action>audAllTgt</action>
+> </cmd>
+> ```
 ###  Response:
 
 ```xml
