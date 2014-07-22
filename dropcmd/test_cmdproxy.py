@@ -123,4 +123,74 @@ class CmdProxyTest(unittest.TestCase):
         self.assertIn("endSessionAck", self.cmd_tr.value())
         self.cmd_tr.clear()        
                 
+    def test_addTgtWUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['addTgtW'])
+        self.assertIn('addTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AddTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_remTgtWUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['remTgtW'])
+        self.assertIn('removeTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.RemTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_audTgtWUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['audReqW'])
+        self.assertIn('auditRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AudTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
         
+    def test_udpTgtWUri(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['updTgtW'])
+        self.assertIn('updateTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.UpdTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()  
+        
+    def test_addTgtFNI(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['addTgtF'])
+        self.assertIn('addTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AddTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_remTgtFNI(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['remTgtF'])
+        self.assertIn('removeTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.RemTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+         
+    def test_audTgtFNI(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['audReqF'])
+        self.assertIn('auditRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.AudTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()
+        
+    def test_udpTgtFNI(self):
+        self.test_start()
+        self.cmdProto.dataReceived(Requests['updTgtF'])
+        self.assertIn('updateTargetRequest', self.x1_tr.value())
+        self.x1_tr.clear()
+        self.x1Proto.dataReceived(li_xml_temp.UpdTgtUri_Resp_OK)
+        self.assertIn("success", self.cmd_tr.value())
+        self.cmd_tr.clear()               
