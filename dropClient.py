@@ -7,7 +7,6 @@ Created on 2013-3-11
 from common.multixmlstream import MultiXmlStream
 from twisted.protocols import policies
 from twisted.internet.protocol import ClientFactory
-from twisted.python import log
 Requests = {'start': '<cmd> <action>start</action></cmd> ',
             'intCfgX2':' <cmd><action>intCfgX2</action><x2IP>127.0.0.1</x2IP><x2Port>22345</x2Port> </cmd>',
             'intCfgX2X3':' <cmd><action>intCfgX2X3</action> </cmd>',
@@ -27,6 +26,22 @@ Requests = {'start': '<cmd> <action>start</action></cmd> ',
             'stop':' <cmd><action>stop</action> </cmd>',
             }
 
+class CaseInfo(object):
+    CasePrefix = 'tg-'
+    TargetTypes = {'1':'uri', '2':'wuri', '3':'fni'}
+    def __init__(self, caseDir):
+        self.caseDir = caseDir
+    def parseCaseInfoString(self, CaseInfoStr):
+        CaseInfoList = CaseInfoStr.split('_')
+        self.caseFileName = self.caseDir+'/'+CaseInfo.CasePrefix+CaseInfoList[0]
+        self.targetType = CaseInfo.TargetTypes[CaseInfoList[1]]
+        self.liridBaseNum = int(CaseInfoList[2]) if CaseInfoList[2].isdigit() else ''
+        self.ccReq = CaseInfoList[3]
+        
+    def parseCaseFile(self):
+        pass
+        
+        
 class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
     def __init__(self):
         self._timeOut = 30
@@ -36,11 +51,11 @@ class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
     def connectionMade(self):
         self.setTimeout(self._timeOut)
         MultiXmlStream.connectionMade(self)
-        log.msg("send out cmd req: %s" % self.factory.cmd)
+        print("send out cmd req: %s" % self.factory.cmd)
         self.send(self.factory.cmd)    
     
     def onDocumentEnd(self):
-        log.msg("recv cmd resp: %s" % self.recvRootElement.toXml())
+        print("recv cmd resp: %s" % self.recvRootElement.toXml())
         self.transport.loseConnection()
 
 class LiClientFactory(ClientFactory):
@@ -60,21 +75,20 @@ import optparse
 from common import config
 def parse_args():
     usage = """usage: %prog [options] [hostname]:port
-this is the hello client generator.
 Run it like this:
 
-    python Client.py -a start 192.168.11.80:5061
-it means it  will generate 2 clients and each clients will send 10 hello message to 192.168.11.80:5060
+    python Client.py -a start -n 2.3.1_1_123_true 127.0.0.1:33333
+it means the client will send cmd xml string with start action to the server 127.0.0.1:33333
 """
     parser = optparse.OptionParser(usage)
-    parser.add_option("-a", "--action", dest="action" , help="please input action type: start|stop|intCfg|audTgt|addTgt|remTgt|updTgt|x2Msgs", default= None)
-    parser.add_option("-u", "--uri", dest="uri" , help="please input sip uri", default='')
-    parser.add_option("-c", "--ccReq", dest="ccReq" , action='store_true' , help="if it set, ccReq is enabled", default=False)
-    parser.add_option('-l', '--lirid', dest='lirid', type='int', help='please input lirid number')
-    parser.add_option('-x', '--x2IP', dest='x2IP', help='please input X2 IP Address')
-    parser.add_option('-p', '--x2Port', dest='x2Port', type='int', help='please input X2 Port')
-    parser.add_option('-X', '--x3IP', dest='x3IP', help='please input X3 IP Address')
-    parser.add_option('-P', '--x3Port', dest='x3Port', type='int', help='please input X3 Port')
+    parser.add_option("-a", "--action", dest="action" , 
+                      help = "please input action type: %s " % ([k for k in config.ActionDict]))
+    parser.add_option("-n", "--caseinfo", dest="caseInfo" , help="please input case information")
+    parser.add_option("-d", "--dir", dest="caseDir" , help="please input case directory")
+    parser.add_option('-x', '--xiiIP', dest='x2IP', help='please input XII IP Address')
+    parser.add_option('-p', '--xiiPort', dest='x2Port', type='int', help='please input XII Port')
+    parser.add_option('-X', '--xiiiIP', dest='x3IP', help='please input XIII IP Address')
+    parser.add_option('-P', '--xiiiPort', dest='x3Port', type='int', help='please input XIII Port')
     
     options, addresses = parser.parse_args()
    
@@ -106,6 +120,14 @@ def generateCmd(options):
     action = options.action
     args = config.ActionDict[action]
     kwargs = {}
+    
+    if options.caseDir :
+        caseInfo = CaseInfo(options.caseDir)
+        
+    if options.caseInfo:
+        caseInfo = CaseInfo()
+        caseInfo.parseCaseInfoString(options.caseInfo)
+    
     for arg in args:
         if 'IP' in arg:
             kwargs[arg] = config.convertip(getattr(options, arg))
