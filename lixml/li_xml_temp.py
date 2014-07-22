@@ -228,7 +228,7 @@ def audTgtUri(seqNbr=1,
 
 
 def addTgtWildcardUri(seqNbr = 1,
-          wuri="sip:user*@cscf.com", lirid = 1, ccReq = True
+          wuri="sip:user*@cscf.com", lirid = 1, ccReq = 'true'
           ):
     AddTgtWildcardUri = '''
     <LIC-Msg>
@@ -254,11 +254,11 @@ def addTgtWildcardUri(seqNbr = 1,
     </LIC-Msg>    
     '''
     return AddTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, wuri, '<cCRequired/>' if ccReq else "", lirid )
+                        seqNbr, wuri, '<cCRequired/>' if ccReq == 'true' else "", lirid )
 
         
 def updTgtWildcardUri(seqNbr = 1,
-          wuri="sip:user*@cscf.com", lirid = 1, ccReq = True
+          wuri="sip:user*@cscf.com", lirid = 1, ccReq = 'true'
           ):
     UpdTgtWildcardUri = '''
     <LIC-Msg>
@@ -284,7 +284,7 @@ def updTgtWildcardUri(seqNbr = 1,
     </LIC-Msg>    
     '''
     return UpdTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, wuri, '<cCRequired/>' if ccReq else "",lirid)
+                        seqNbr, wuri, '<cCRequired/>' if ccReq == 'true' else "",lirid)
 def remTgtWildcardUri(seqNbr = 1,
           wuri="sip:user*@cscf.com"):
     RemTgtWildcardUri = '''
@@ -333,7 +333,7 @@ def audTgtWildcardUri(
     return AudTgtWildcardUri % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
                         seqNbr, wuri)
 def addTgtFNI(seqNbr = 1,
-          fni="pstn1", lirid = 1, ccReq = True
+          fni="pstn1", lirid = 1, ccReq = 'true'
           ):
     AddTgtFNI = '''
     <LIC-Msg>
@@ -359,11 +359,11 @@ def addTgtFNI(seqNbr = 1,
     </LIC-Msg>    
     '''
     return AddTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, fni, '<cCRequired/>' if ccReq else "", lirid )
+                        seqNbr, fni, '<cCRequired/>' if ccReq == 'true' else "", lirid )
 
         
 def updTgtFNI(seqNbr = 1,
-          fni="pstn1", lirid = 1, ccReq = True
+          fni="pstn1", lirid = 1, ccReq = 'true'
           ):
     UpdTgtFNI = '''
     <LIC-Msg>
@@ -389,7 +389,7 @@ def updTgtFNI(seqNbr = 1,
     </LIC-Msg>    
     '''
     return UpdTgtFNI % (config.Lic_ObjectId, config.Lic_ProtObjectId, config.Lic_ProtVersion.major, config.Lic_ProtVersion.minor, 
-                        seqNbr, fni, '<cCRequired/>' if ccReq else "",lirid)
+                        seqNbr, fni, '<cCRequired/>' if ccReq == 'true' else "",lirid)
 def remTgtFNI(seqNbr = 1,
           fni="pstn1"):
     RemTgtFNI = '''
