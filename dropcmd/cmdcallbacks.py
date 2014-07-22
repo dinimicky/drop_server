@@ -186,6 +186,12 @@ class addTgtUri(CmdCB):
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
         super(addTgtUri, self)._sendXml2X1Client(protoInst)
         
+class addTgtWildcardUri(addTgtUri):
+    pass
+
+class addTgtFNI(addTgtUri):
+    pass
+
 class updTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
@@ -194,6 +200,12 @@ class updTgtUri(CmdCB):
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
         super(updTgtUri, self)._sendXml2X1Client(protoInst)
 
+class updTgtWildcardUri(updTgtUri):
+    pass
+
+class updTgtFNI(updTgtUri):
+    pass
+
 class remTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
         protoInst.factory.state.x1Seq += 1
@@ -201,6 +213,12 @@ class remTgtUri(CmdCB):
                                               self._getX1ReqXmlString(protoInst.recvRootElement,
                                                                       seqNbr = protoInst.factory.state.x1Seq)))
         super(remTgtUri, self)._sendXml2X1Client(protoInst)
+
+class remTgtWildcardUri(remTgtUri):
+    pass
+
+class remTgtFNI(remTgtUri):
+    pass
 
 class audTgtUri(CmdCB):
     def _sendXml2X1Client(self, protoInst):
@@ -213,3 +231,8 @@ class audTgtUri(CmdCB):
 class audAllTgt(audTgtUri):
     pass
 
+class audTgtWildcardUri(audTgtUri):
+    pass
+
+class audTgtFNI(audTgtUri):
+    pass
