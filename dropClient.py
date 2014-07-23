@@ -39,7 +39,9 @@ class CaseInfo(object):
         self.ccReq = CaseInfoList[3]
         
     def parseCaseFile(self):
-        pass
+        with open(self.caseFileName, 'r') as fh:
+            for l in fh:
+                pass
         
         
 class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
@@ -84,7 +86,7 @@ it means the client will send cmd xml string with start action to the server 127
     parser.add_option("-a", "--action", dest="action" , 
                       help = "please input action type: %s " % ([k for k in config.ActionDict]))
     parser.add_option("-n", "--caseinfo", dest="caseInfo" , help="please input case information")
-    parser.add_option("-d", "--dir", dest="caseDir" , help="please input case directory")
+    parser.add_option("-d", "--dir", dest="caseDir" , help="please input case directory", default='./')
     parser.add_option('-x', '--xiiIP', dest='x2IP', help='please input XII IP Address')
     parser.add_option('-p', '--xiiPort', dest='x2Port', type='int', help='please input XII Port')
     parser.add_option('-X', '--xiiiIP', dest='x3IP', help='please input XIII IP Address')
@@ -121,11 +123,9 @@ def generateCmd(options):
     args = config.ActionDict[action]
     kwargs = {}
     
-    if options.caseDir :
-        caseInfo = CaseInfo(options.caseDir)
+    caseInfo = CaseInfo(options.caseDir)        
         
     if options.caseInfo:
-        caseInfo = CaseInfo()
         caseInfo.parseCaseInfoString(options.caseInfo)
     
     for arg in args:
