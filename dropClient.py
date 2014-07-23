@@ -8,23 +8,23 @@ from common.multixmlstream import MultiXmlStream
 from twisted.protocols import policies
 from twisted.internet.protocol import ClientFactory
 from common import config
-Requests = {'start': '<cmd> <action>start</action></cmd> ',
-            'intCfgX2':' <cmd><action>intCfgX2</action><x2IP>127.0.0.1</x2IP><x2Port>22345</x2Port> </cmd>',
-            'intCfgX2X3':' <cmd><action>intCfgX2X3</action> </cmd>',
-            'addTgt':' <cmd><action>addTgtUri</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
+Requests = {'start': '<cmd><action>start</action></cmd>',
+            'intCfgX2':'<cmd><action>intCfgX2</action><x2IP>7F000001</x2IP><x2Port>22345</x2Port></cmd>',
+            'intCfgX2X3':'<cmd><action>intCfgX2X3</action><x2IP>7F000001</x2IP><x2Port>22345</x2Port><x3IP>7F000001</x3IP><x3Port>32345</x3Port></cmd>',
+            'addTgt':'<cmd><action>addTgtUri</action><uri>TEL:+86690000008001</uri><ccReq>true</ccReq><lirid>1</lirid></cmd>',
             'audAll':' <cmd><action>audAllTgt</action></cmd> ',
             'audReq':' <cmd><action>audTgtUri</action> <uri>sip:123@163.com</uri></cmd> ',
             'updTgt':' <cmd><action>updTgtUri</action> <uri>sip:123@163.com</uri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
             'remTgt':' <cmd><action>remTgtUri</action> <uri>sip:123@163.com</uri></cmd>',
-            'addTgtW':' <cmd><action>addTgtWildcardUri</action> <wuri>sip:123@163.com</wuri><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
-            'audReqW':' <cmd><action>audTgtWildcardUri</action> <wuri>sip:123@163.com</wuri></cmd> ',
-            'updTgtW':' <cmd><action>updTgtWildcardUri</action> <wuri>sip:123@163.com</wuri><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
-            'remTgtW':' <cmd><action>remTgtWildcardUri</action> <wuri>sip:123@163.com</wuri></cmd>',
-            'addTgtF':' <cmd><action>addTgtFNI</action> <fni>sip:123@163.com</fni><lirid>123</lirid> <ccReq>true</ccReq></cmd> ',
-            'audReqF':' <cmd><action>audTgtFNI</action> <fni>sip:123@163.com</fni></cmd> ',
-            'updTgtF':' <cmd><action>updTgtFNI</action> <fni>sip:123@163.com</fni><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
-            'remTgtF':' <cmd><action>remTgtFNI</action> <fni>sip:123@163.com</fni></cmd>',
-            'stop':' <cmd><action>stop</action> </cmd>',
+            'addTgtW':'<cmd><action>addTgtWildcardUri</action><wuri>TEL:888*</wuri><ccReq>true</ccReq><lirid>1</lirid></cmd>',
+            'audReqW':'<cmd><action>audTgtWildcardUri</action> <wuri>sip:123@163.com</wuri></cmd> ',
+            'updTgtW':'<cmd><action>updTgtWildcardUri</action> <wuri>sip:123@163.com</wuri><lirid>123</lirid> <ccReq>false</ccReq></cmd>',
+            'remTgtW':'<cmd><action>remTgtWildcardUri</action> <wuri>sip:123@163.com</wuri></cmd>',
+            'addTgtF':'<cmd><action>addTgtFNI</action><fni>PSTN-Route</fni><ccReq>true</ccReq><lirid>1</lirid></cmd>',
+            'audReqF':'<cmd><action>audTgtFNI</action> <fni>sip:123@163.com</fni></cmd> ',
+            'updTgtF':'<cmd><action>updTgtFNI</action> <fni>sip:123@163.com</fni><lirid>123</lirid> <ccReq>false</ccReq></cmd> ',
+            'remTgtF':'<cmd><action>remTgtFNI</action> <fni>sip:123@163.com</fni></cmd>',
+            'stop':'<cmd><action>stop</action></cmd>',
             }
 
 class CaseInfo(object):
@@ -121,7 +121,7 @@ it means the client will send cmd xml string with start action to the server 127
     if 'intCfgX2X3' in options.action and (not options.x3IP) and (not options.x3Port):
         parser.error('action %s need -X and -P parameter' % options.action)
         
-    if 'Tgt' in options.action and (not options.caseinfo):
+    if 'Tgt' in options.action and (not options.caseInfo):
         parser.error('action %s need -n' % options.action)
    
     if not addresses:
@@ -147,6 +147,13 @@ it means the client will send cmd xml string with start action to the server 127
     
     return host, port, options
 
+class TargetTypeMisatchError(Exception):
+    def __init__(self, action, targetType):
+        self.action = action
+        self.targetType = targetType
+    def __str__(self):
+        return 'action and target type mismatch, action: %s, type: %s [0:uri, 1:wuri, 2:fni]' % (self.action, self.targetType)
+
 def generateCmd(options):
     from dropcmd.cmdcallbacks import CmdReq
     action = options.action
@@ -160,13 +167,15 @@ def generateCmd(options):
         
         for tgt in caseInfo.targetList:
             kwargs = {}
+            if caseInfo.targetType != config.ActionDict[action][0]:
+                raise TargetTypeMisatchError(action, caseInfo.targetType)
             setattr(options, caseInfo.targetType, tgt)
             setattr(options, 'ccReq', caseInfo.ccReq)
             setattr(options, 'lirid', caseInfo.liridBaseNum)
             if caseInfo.liridBaseNum != '':
                 caseInfo.liridBaseNum +=1
             for arg in args:
-                kwargs[arg] = getattr(options, arg)
+                kwargs[arg] = str(getattr(options, arg))
             kwargsList.append(kwargs)
             
         return  [ CmdReq(action, args, **kwargs).toXml() for kwargs in kwargsList ]
@@ -176,7 +185,7 @@ def generateCmd(options):
         if 'IP' in arg:
             kwargs[arg] = config.convertip(getattr(options, arg))
             continue
-        kwargs[arg] = getattr(options, arg)
+        kwargs[arg] = str(getattr(options, arg))
         
     return [CmdReq(action, args, **kwargs).toXml()]
     
