@@ -48,9 +48,9 @@
 > ```
 
 > the target has 3 kinds:
->> 1. uri, the element is `<uri>`
->> 2. wild-card-uri, the element is `<wuri>`
->> 3. foreignNetworkIdentifier, the element is `<fni>`
+>> 1. uri, id = 0, the element is `<uri>`, the related action is xxxTgtUri; xxx is add/rem/upd/aud
+>> 2. wild-card-uri, id = 1, the element is `<wuri>`, the related action is xxxTgtWildcardUri; xxx is add/rem/upd/aud
+>> 3. foreignNetworkIdentifier, id = 2, the element is `<fni>`, , the related action is xxxTgtFNI; xxx is add/rem/upd/aud
 
 > addTarget:
 > ```xml
