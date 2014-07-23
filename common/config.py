@@ -89,23 +89,24 @@ addTarget:
      <result>success/failure</result>
  </cmd>   
 '''
+TargetTypes = ['uri', 'wuri', 'fni']
 ActionDict = {'start' : [],
               'stop' : [],
               'intCfgX2' : ['x2IP', 'x2Port'],
               'intCfgX2X3' : ['x2IP', 'x2Port', 'x3IP', 'x3Port'],
-              'audTgtUri' : ['uri'],
+              'audTgtUri' : [TargetTypes[0]],
               'audAllTgt' : [],
-              'addTgtUri' : ['uri', 'ccReq', 'lirid'],
-              'remTgtUri' : ['uri'],
-              'updTgtUri' : ['uri', 'ccReq', 'lirid'],
-              'addTgtWildcardUri' : ['wuri', 'ccReq', 'lirid'],
-              'remTgtWildcardUri' : ['wuri'],
-              'updTgtWildcardUri' : ['wuri', 'ccReq', 'lirid'],
-              'audTgtWildcardUri' : ['wuri'],
-              'addTgtFNI' : ['fni', 'ccReq', 'lirid'],
-              'remTgtFNI' : ['fni'],
-              'updTgtFNI' : ['fni', 'ccReq', 'lirid'],
-              'audTgtFNI' : ['fni'],
+              'addTgtUri' : [TargetTypes[0], 'ccReq', 'lirid'],
+              'remTgtUri' : [TargetTypes[0]],
+              'updTgtUri' : [TargetTypes[0], 'ccReq', 'lirid'],
+              'addTgtWildcardUri' : [TargetTypes[1], 'ccReq', 'lirid'],
+              'remTgtWildcardUri' : [TargetTypes[1]],
+              'updTgtWildcardUri' : [TargetTypes[1], 'ccReq', 'lirid'],
+              'audTgtWildcardUri' : [TargetTypes[1]],
+              'addTgtFNI' : [TargetTypes[2], 'ccReq', 'lirid'],
+              'remTgtFNI' : [TargetTypes[2]],
+              'updTgtFNI' : [TargetTypes[2], 'ccReq', 'lirid'],
+              'audTgtFNI' : [TargetTypes[2]],
               
               }
 import socket
