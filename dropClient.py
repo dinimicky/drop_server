@@ -65,8 +65,8 @@ class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
     def connectionMade(self):
         self.setTimeout(self._timeOut)
         MultiXmlStream.connectionMade(self)
-        print("send out cmd req: %s" % self.factory.cmd)
         cmd = self.factory.cmds.pop(0)
+        print("send out cmd req: %s" % cmd)
         self.send(cmd)    
     
     def onDocumentEnd(self):

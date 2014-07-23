@@ -19,12 +19,12 @@ class DropClientTest(unittest.TestCase):
         self.clock = task.Clock()
 
      
-    def _sendCmd(self, cmd):
-        factory = LiClientFactory(cmd)
+    def _sendCmds(self, cmds):
+        factory = LiClientFactory(cmds)
         self.proto = factory.buildProtocol(('127.0.0.1', 0))
         self.tr.protocol = self.proto
         self.proto.callLater = self.clock.callLater
-        self.proto.factory.cmd = cmd
+        self.proto.factory.cmds = cmds
         self.proto.makeConnection(self.tr)
         def lost():
             return
@@ -36,11 +36,11 @@ class DropClientTest(unittest.TestCase):
         
     def test_start(self):
         cmd = dropClient.Requests['start']
-        self._sendCmd(cmd)
+        self._sendCmds([cmd])
         self.assertIn('start', self.tr.value())
         
     def test_result_success(self):
-        self._sendCmd(dropClient.Requests['start'])
+        self._sendCmds([dropClient.Requests['start']])
         self._sendResp("success", "test start")
         self.assertIn("success", str(self.proto.recvRootElement.toXml()))
          
