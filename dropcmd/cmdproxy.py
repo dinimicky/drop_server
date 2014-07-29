@@ -15,7 +15,7 @@ class CmdProxyServerProtocol(MultiXmlStream):
     def connectionMade(self):
         for k, v in CmdProxyServerProtocol.ActionDict.iteritems():
             from importlib import import_module
-            m = import_module("cmdcallbacks")
+            m = import_module("dropcmd.cmdcallbacks")
             cmdObserver = getattr(m, k)(k, *v)
             log.msg('add Observer: %s' % k)
             self.addObserver(cmdObserver.xPathQuery, cmdObserver.checkCmdAction, 0, self)
