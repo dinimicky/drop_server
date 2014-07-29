@@ -61,10 +61,16 @@ class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
         self._timeOut = 30
         MultiXmlStream.__init__(self)
 
+    def exit(self):
+        self.transport.loseConnection()
+        from twisted.internet import reactor
+        reactor.stop()            
         
     def connectionMade(self):
         self.setTimeout(self._timeOut)
         MultiXmlStream.connectionMade(self)
+        if self.factory.cmds == []:
+            self.exit()
         cmd = self.factory.cmds.pop(0)
         print("send out cmd req: %s" % cmd)
         self.send(cmd)    
@@ -76,7 +82,7 @@ class LiClientProtocol(MultiXmlStream, policies.TimeoutMixin):
             cmd = self.factory.cmds.pop(0)
             self.send(cmd)
         else:                    
-            self.transport.loseConnection()
+            self.exit()    
 
 class LiClientFactory(ClientFactory):
     protocol = LiClientProtocol
